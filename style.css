@@ -1,0 +1,102 @@
+/* Mattero – felles stil */
+:root {
+  --bg: #fbfaf7;
+  --surface: #ffffff;
+  --text: #1f2328;
+  --muted: #5d6470;
+  --accent: #2f6f6a;
+  --accent-soft: #e4f0ee;
+  --border: #e6e2da;
+  --radius: 14px;
+  --maxw: 880px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #15181b;
+    --surface: #1d2125;
+    --text: #e8e6e1;
+    --muted: #9aa1aa;
+    --accent: #7cc3bb;
+    --accent-soft: #1f3331;
+    --border: #2c3136;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 20px; }
+
+/* Topp */
+header.site {
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+header.site .wrap {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px; padding-top: 16px; padding-bottom: 16px;
+}
+.logo {
+  font-weight: 700; font-size: 1.25rem; letter-spacing: -0.02em;
+  color: var(--text); text-decoration: none;
+}
+.logo span { color: var(--accent); }
+nav.main { display: flex; flex-wrap: wrap; gap: 4px; }
+nav.main a {
+  color: var(--muted); text-decoration: none; padding: 6px 10px;
+  border-radius: 8px; font-size: 0.95rem; font-weight: 500;
+}
+nav.main a:hover, nav.main a[aria-current="page"] {
+  background: var(--accent-soft); color: var(--accent);
+}
+
+/* Innhold */
+main { padding: 56px 0 72px; }
+h1 { font-size: clamp(2rem, 5vw, 2.8rem); line-height: 1.15; letter-spacing: -0.03em; margin: 0 0 16px; }
+h2 { font-size: 1.4rem; letter-spacing: -0.01em; margin: 48px 0 12px; }
+h3 { font-size: 1.1rem; margin: 0 0 6px; }
+.lead { font-size: 1.15rem; color: var(--muted); max-width: 60ch; }
+
+/* Kort-rutenett */
+.grid {
+  display: grid; gap: 16px; margin-top: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+}
+.card {
+  display: block; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 22px; color: var(--text);
+  text-decoration: none; transition: transform .15s, border-color .15s;
+}
+.card:hover { transform: translateY(-2px); border-color: var(--accent); }
+.card p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+.tag {
+  display: inline-block; font-size: 0.8rem; font-weight: 600; color: var(--accent);
+  background: var(--accent-soft); padding: 2px 10px; border-radius: 99px; margin-bottom: 10px;
+}
+
+/* Liste over opplegg på kurssider */
+ul.opplegg { list-style: none; padding: 0; margin: 16px 0 0; }
+ul.opplegg li {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px 18px; margin-bottom: 10px;
+}
+ul.opplegg li small { display: block; color: var(--muted); }
+
+.breadcrumb { font-size: 0.9rem; color: var(--muted); margin-bottom: 12px; }
+
+/* Bunn */
+footer.site { border-top: 1px solid var(--border); color: var(--muted); font-size: 0.9rem; }
+footer.site .wrap { padding-top: 24px; padding-bottom: 32px; }
