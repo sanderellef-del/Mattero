@@ -3,10 +3,87 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Mattero</title>
+  <title>Mattero – undervisningsressurser i matematikk</title>
+  <meta name="description" content="Åpne undervisningsopplegg og oppgaver i matematikk for videregående skole: 1P, 2P, 1T, R1 og R2.">
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .hero { padding: 48px 0 24px; }
+    .hero h1 { font-size: 2.4rem; line-height: 1.15; margin: 0 0 12px; }
+    .kurs {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+      margin: 24px 0 48px;
+    }
+    .kort {
+      display: block;
+      padding: 20px 22px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      text-decoration: none;
+      transition: border-color .15s, transform .15s;
+    }
+    .kort:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .kort .navn { font-size: 1.3rem; font-weight: 700; color: var(--accent); }
+    .kort p { margin: 6px 0 0; color: var(--muted); font-size: .95rem; }
+  </style>
 </head>
 <body>
-  <h1>Mattero</h1>
-  <p>Undervisningsressurser i matematikk.</p>
+  <header class="site">
+    <div class="wrap">
+      <a class="logo" href="/">Mattero</a>
+      <nav class="main">
+        <a href="/1p/">1P</a>
+        <a href="/2p/">2P</a>
+        <a href="/1t/">1T</a>
+        <a href="/r1/">R1</a>
+        <a href="/r2/">R2</a>
+        <a href="/om/">Om</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <section class="hero">
+        <h1>Matematikk for videregående</h1>
+        <p class="lead">Åpne undervisningsopplegg, oppgavesett og ressurser – fritt til bruk for elever og lærere.</p>
+      </section>
+
+      <h2>Velg kurs</h2>
+      <div class="kurs">
+        <a class="kort" href="/1p/">
+          <span class="navn">1P</span>
+          <p>Praktisk matematikk, Vg1</p>
+        </a>
+        <a class="kort" href="/2p/">
+          <span class="navn">2P</span>
+          <p>Praktisk matematikk, Vg2</p>
+        </a>
+        <a class="kort" href="/1t/">
+          <span class="navn">1T</span>
+          <p>Teoretisk matematikk, Vg1</p>
+        </a>
+        <a class="kort" href="/r1/">
+          <span class="navn">R1</span>
+          <p>Realfagsmatematikk, Vg2</p>
+        </a>
+        <a class="kort" href="/r2/">
+          <span class="navn">R2</span>
+          <p>Realfagsmatematikk, Vg3</p>
+        </a>
+        <a class="kort" href="/om/">
+          <span class="navn">Om</span>
+          <p>Hvem står bak Mattero?</p>
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site">
+    <div class="wrap">© Mattero · Fritt til bruk i undervisning</div>
+  </footer>
 </body>
 </html>
