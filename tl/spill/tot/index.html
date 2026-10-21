@@ -11,17 +11,9 @@
 :root{
   --font:"Andika","Trebuchet MS","Verdana",sans-serif;
   --ink:#23305A;
-  --bg:#D6EEFF;
-  --field:#FFFFFF;
-  --grid:#DCEAF8;
-  --cell:#FFFFFF;
-  --panel:#FFFFFF;
-  --text:#23305A;
-  --muted:#4F5F88;
-  --line:#23305A;
-  --shadow:#23305A;
-  --star-empty:#EAF2FB;
-  --scrim:rgba(214,238,255,.92);
+  --bg:#D6EEFF;--field:#FFFFFF;--grid:#DCEAF8;--cell:#FFFFFF;--panel:#FFFFFF;
+  --text:#23305A;--muted:#4F5F88;--line:#23305A;--shadow:#23305A;
+  --star-empty:#EAF2FB;--scrim:rgba(214,238,255,.92);
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px);
   padding-bottom:env(safe-area-inset-bottom,0px);
@@ -43,43 +35,50 @@ html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
 body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:var(--font);overflow:hidden;-webkit-user-select:none;user-select:none}
 [hidden]{display:none!important}
 
-.app{height:100%;max-width:1100px;margin:0 auto;display:grid;grid-template-rows:auto 1fr auto auto;gap:clamp(8px,1.8vh,16px);padding:clamp(10px,2.5vw,24px)}
+.app{height:100%;max-width:1100px;margin:0 auto;display:grid;grid-template-rows:auto 1fr auto auto;gap:clamp(8px,1.6vh,14px);padding:clamp(10px,2.5vw,24px)}
 
 /* Topplinje */
-.top{display:flex;justify-content:space-between;align-items:center;gap:10px 20px;flex-wrap:wrap}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px 16px;flex-wrap:wrap}
 .progress{display:flex;gap:12px;flex-wrap:wrap}
 .grp{display:flex;gap:3px}
-.pstar{width:clamp(16px,3vw,24px);height:clamp(16px,3vw,24px);display:block;overflow:visible}
+.pstar{width:clamp(18px,3.2vw,26px);height:clamp(18px,3.2vw,26px);display:block;overflow:visible}
 .pstar polygon{fill:var(--star-empty);stroke:var(--line);stroke-width:7;stroke-linejoin:round}
 .pstar.on polygon{fill:#FFC933;stroke:var(--ink)}
 .pstar.pop{animation:pop .5s cubic-bezier(.3,1.6,.6,1)}
+.tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 
-.seg{display:inline-flex;background:var(--panel);border:3px solid var(--line);border-radius:999px;padding:4px;gap:4px}
-.seg button{font:700 1rem/1 var(--font);border:0;background:transparent;color:var(--text);padding:.5em 1em;border-radius:999px;cursor:pointer}
+.seg{display:inline-flex;flex-wrap:wrap;justify-content:center;background:var(--panel);border:3px solid var(--line);border-radius:26px;padding:4px;gap:4px}
+.seg button{font:700 1rem/1 var(--font);border:0;background:transparent;color:var(--text);padding:.55em 1em;border-radius:999px;cursor:pointer}
 .seg button[aria-pressed="true"]{background:#8FB3FF;color:var(--ink)}
-.seg button:focus-visible{outline:3px dashed var(--text);outline-offset:2px}
+.seg.games button[aria-pressed="true"]{background:#FFE066}
+.seg button:focus-visible,.ghost:focus-visible{outline:3px dashed var(--text);outline-offset:2px}
+.ghost{font:700 1rem/1 var(--font);color:var(--text);background:var(--panel);border:3px solid var(--line);border-radius:999px;padding:.6em 1.1em;cursor:pointer}
 
 /* Spillefelt: ruteark */
 .field{position:relative;min-height:170px;border-radius:28px;border:3px solid var(--line);background-color:var(--field);
   background-image:linear-gradient(var(--grid) 2px,transparent 2px),linear-gradient(90deg,var(--grid) 2px,transparent 2px);
   background-size:32px 32px;background-position:-1px -1px;overflow:hidden}
 .layer{position:absolute;inset:0;transition:opacity .3s ease,transform .3s ease}
-.field.leaving .layer,.field.leaving .badge{opacity:0;transform:translateX(-28px)}
+.field.leaving .layer,.field.leaving .badge,.question.leaving{opacity:0;transform:translateX(-28px)}
 
 .obj{position:absolute;padding:0;margin:0;border:0;background:none;cursor:pointer;transform:rotate(var(--rot,0deg));border-radius:50%;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .obj:focus-visible{outline:4px dashed var(--text);outline-offset:4px}
 .bob,.art{display:block;width:100%;height:100%}
-.art{animation:pop .45s cubic-bezier(.3,1.5,.6,1) both;animation-delay:var(--d,0ms);transition:opacity .2s,filter .2s}
+.art{animation:pop .45s cubic-bezier(.3,1.5,.6,1) both;animation-delay:var(--d,0ms);transition:opacity .3s,filter .3s}
 .obj.still .art{animation:none}
 .art svg{width:100%;height:100%;display:block;overflow:visible}
+.obj.prev .art{opacity:.62;filter:saturate(.55)}
 .obj.counted .art{opacity:.7;filter:saturate(.6)}
-.check{position:absolute;right:-4%;bottom:-4%;width:38%;height:38%;min-width:22px;min-height:22px;border-radius:50%;background:#2BB673;border:3px solid var(--ink);display:grid;place-items:center;transform:scale(0);transition:transform .2s cubic-bezier(.3,1.6,.6,1)}
+.obj.prev.counted .art{opacity:.55}
+.check{position:absolute;right:-4%;bottom:-4%;width:38%;height:38%;min-width:20px;min-height:20px;border-radius:50%;background:#2BB673;border:3px solid var(--ink);display:grid;place-items:center;transform:scale(0);transition:transform .2s cubic-bezier(.3,1.6,.6,1)}
 .check svg{width:72%;height:72%}
 .obj.counted .check{transform:scale(1)}
 .obj.hop .bob{animation:hop .55s ease-in-out 2;animation-delay:var(--hd,0ms)}
+.obj.hop1 .bob{animation:hop .5s ease-in-out 1}
 
-/* Tierramme */
-.frame{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:grid;gap:4px;padding:4px;background:var(--line);border-radius:18px}
+/* Tierrammer */
+.frames{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;gap:14px}
+.frame{display:grid;gap:4px;padding:4px;background:var(--line);border-radius:18px}
 .cell{background:var(--cell);border-radius:11px;display:grid;place-items:center;position:relative}
 .cell .obj{position:relative;width:80%;height:80%;transform:none}
 
@@ -88,31 +87,40 @@ body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:var
 .medal{position:relative;width:min(34%,190px);aspect-ratio:1;transform:scale(0)}
 .badge.show .medal{animation:pop .5s cubic-bezier(.3,1.6,.6,1) forwards}
 .medal svg{width:100%;height:100%;display:block;overflow:visible}
-.medal span{position:absolute;inset:0;display:grid;place-items:center;padding-top:10%;font:700 clamp(2.4rem,7vw,4.6rem)/1 var(--font);color:var(--ink)}
+.medal span{position:absolute;inset:0;display:grid;place-items:center;padding-top:10%;font:700 clamp(2.2rem,6.5vw,4.4rem)/1 var(--font);color:var(--ink)}
 
-.question{margin:0;text-align:center;font-weight:700;font-size:clamp(1.1rem,2.6vw,1.5rem);color:var(--muted)}
+/* Spørsmål og regnestykke */
+.question{margin:0;min-height:clamp(2.8rem,7vw,4rem);display:grid;place-items:center;text-align:center;font-weight:700;font-size:clamp(1.1rem,2.6vw,1.5rem);color:var(--muted);transition:opacity .3s ease,transform .3s ease}
+.eq{display:flex;justify-content:center;align-items:center;gap:.35em;font:700 clamp(2rem,6vw,3.2rem)/1 var(--font);color:var(--text)}
+.eq .t{display:inline-block;animation:pop .45s cubic-bezier(.3,1.5,.6,1) both;animation-delay:var(--d,0ms)}
+.eq .t.wait{visibility:hidden;animation:none}
+.eq .ans{min-width:1.6em;height:1.3em;border:3px dashed var(--muted);border-radius:14px;display:inline-grid;place-items:center;padding:0 .15em}
+.eq .ans.filled{border-style:solid;border-color:#2BB673;background:rgba(43,182,115,.16)}
+.eq .ans b{display:inline-block;animation:pop .45s cubic-bezier(.3,1.5,.6,1) both}
 
 /* Tallknapper */
-.pad{display:grid;grid-template-columns:repeat(5,1fr);gap:clamp(8px,1.6vw,16px);width:100%;max-width:900px;justify-self:center;padding-bottom:8px}
-.num{font:700 clamp(1.9rem,5.5vw,3.2rem)/1 var(--font);color:var(--ink);background:var(--c);border:3px solid var(--ink);border-radius:22px;box-shadow:0 6px 0 var(--shadow);min-height:clamp(58px,11vh,96px);cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:transform .12s ease,box-shadow .12s ease}
+.pad{display:grid;grid-template-columns:repeat(5,1fr);gap:clamp(8px,1.5vw,14px);width:100%;max-width:900px;justify-self:center;padding-bottom:8px}
+.num{font:700 clamp(1.9rem,5.5vw,3.2rem)/1 var(--font);color:var(--ink);background:var(--c);border:3px solid var(--ink);border-radius:22px;box-shadow:0 6px 0 var(--shadow);min-height:clamp(56px,10.5vh,96px);cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:transform .12s ease,box-shadow .12s ease}
+.pad.three .num{min-height:clamp(46px,8vh,80px);font-size:clamp(1.6rem,4.6vw,2.7rem)}
 .num:active{transform:translateY(4px);box-shadow:0 2px 0 var(--shadow)}
 .num:focus-visible{outline:4px dashed var(--text);outline-offset:3px}
 .num.right{transform:translateY(-3px) scale(1.06);box-shadow:0 6px 0 var(--shadow),0 0 0 6px #2BB673}
 .num.nope{animation:shake .45s ease}
 
 /* Overlegg */
-.overlay{position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:var(--scrim);padding:16px}
-.card{background:var(--panel);border:3px solid var(--line);border-radius:32px;padding:clamp(24px,5vw,44px);text-align:center;width:min(560px,100%);box-shadow:0 10px 0 var(--shadow)}
+.overlay{position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:var(--scrim);padding:16px;overflow-y:auto}
+.card{background:var(--panel);border:3px solid var(--line);border-radius:32px;padding:clamp(22px,5vw,42px);text-align:center;width:min(580px,100%);box-shadow:0 10px 0 var(--shadow)}
 .card h1,.card h2{margin:.2em 0 .25em;font-size:clamp(2.2rem,7vw,3.6rem);line-height:1.05}
-.card p{margin:0 0 1.2em;font-size:clamp(1.1rem,3vw,1.35rem);line-height:1.45;color:var(--muted)}
+.card p{margin:0 0 1.1em;font-size:clamp(1.1rem,3vw,1.35rem);line-height:1.45;color:var(--muted)}
 .card p strong{color:var(--text)}
+.card .seg{margin:0 0 1em}
 .samples{display:flex;justify-content:center;gap:14px}
 .samples span{width:clamp(56px,14vw,84px);height:clamp(56px,14vw,84px);display:block}
 .samples span:nth-child(1){transform:rotate(-10deg)}
 .samples span:nth-child(3){transform:rotate(12deg)}
 .samples svg,.trophy svg{width:100%;height:100%;display:block;overflow:visible}
 .trophy{width:clamp(100px,26vw,150px);height:clamp(100px,26vw,150px);margin:0 auto}
-.card .seg{margin:0 0 1.4em}
+.actions{display:flex;gap:14px;justify-content:center;align-items:center;flex-wrap:wrap;margin-top:.4em}
 .big{font:700 clamp(1.4rem,4vw,1.8rem)/1 var(--font);color:var(--ink);background:#FFE066;border:3px solid var(--ink);border-radius:999px;padding:.6em 1.8em;box-shadow:0 6px 0 var(--shadow);cursor:pointer;transition:transform .12s,box-shadow .12s}
 .big:active{transform:translateY(4px);box-shadow:0 2px 0 var(--shadow)}
 .big:focus-visible{outline:4px dashed var(--text);outline-offset:4px}
@@ -123,9 +131,10 @@ body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:var
 @keyframes hop{0%,100%{transform:translateY(0)}45%{transform:translateY(-20%)}}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
 
-@media (max-width:520px){
+@media (max-width:560px){
   .top{justify-content:center}
   .num{border-radius:16px}
+  .seg button{padding:.5em .8em}
 }
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;animation-delay:0ms!important;transition-duration:.01ms!important}
@@ -136,10 +145,13 @@ body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:var
 
 <div class="app">
   <header class="top">
-    <div class="progress" id="progress" role="img" aria-label="0 av 20 runder"></div>
-    <div class="seg" role="group" aria-label="Visning">
-      <button type="button" data-mode="spredt" aria-pressed="true">Spredt</button>
-      <button type="button" data-mode="ramme" aria-pressed="false">Tierramme</button>
+    <div class="progress" id="progress" role="img" aria-label="0 av 10 runder"></div>
+    <div class="tools">
+      <div class="seg" role="group" aria-label="Visning">
+        <button type="button" data-view="spredt" aria-pressed="true">Spredt</button>
+        <button type="button" data-view="ramme" aria-pressed="false">Tierramme</button>
+      </div>
+      <button type="button" class="ghost" id="menuBtn">Meny</button>
     </div>
   </header>
 
@@ -147,7 +159,7 @@ body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:var
     <div class="badge" id="badge" aria-hidden="true"></div>
   </main>
 
-  <p class="question" id="question" aria-live="polite">&nbsp;</p>
+  <div class="question" id="question" aria-live="polite">&nbsp;</div>
 
   <div class="pad" id="pad" role="group" aria-label="Tallknapper"></div>
 </div>
@@ -156,10 +168,15 @@ body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:var
   <div class="card">
     <div class="samples" id="samples" aria-hidden="true"></div>
     <h1>Tell og trykk</h1>
-    <p>Tell tingene og trykk på riktig tall.</p>
+    <p id="gameDesc">Tell tingene og trykk på riktig tall.</p>
+    <div class="seg games" role="group" aria-label="Velg spill">
+      <button type="button" data-game="telling" aria-pressed="true">Telling</button>
+      <button type="button" data-game="addisjon" aria-pressed="false">Addisjon</button>
+      <button type="button" data-game="tier" aria-pressed="false">Tieroverganger</button>
+    </div>
     <div class="seg" role="group" aria-label="Visning">
-      <button type="button" data-mode="spredt" aria-pressed="true">Spredt</button>
-      <button type="button" data-mode="ramme" aria-pressed="false">Tierramme</button>
+      <button type="button" data-view="spredt" aria-pressed="true">Spredt</button>
+      <button type="button" data-view="ramme" aria-pressed="false">Tierramme</button>
     </div>
     <div><button type="button" class="big" id="startBtn">Start</button></div>
   </div>
@@ -168,9 +185,12 @@ body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:var
 <div class="overlay" id="finishScreen" hidden>
   <div class="card">
     <div class="trophy" id="trophy" aria-hidden="true"></div>
-    <h2>Du klarte alle 20!</h2>
-    <p>Tiden din: <strong id="timeText"></strong></p>
-    <button type="button" class="big" id="againBtn">Spill igjen</button>
+    <h2>Du klarte alle 10!</h2>
+    <p id="finishText"></p>
+    <div class="actions">
+      <button type="button" class="big" id="againBtn">Spill igjen</button>
+      <button type="button" class="ghost" id="switchBtn">Bytt spill</button>
+    </div>
   </div>
 </div>
 
@@ -192,19 +212,19 @@ function starPts(cx, cy, R, r){
   return p.join(" ");
 }
 
-/* ---------- Tegninger ---------- */
+/* ---------- Tegninger (hue = fargegruppe, brukes for å skille gruppene i addisjon) ---------- */
 const TYPES = [
-  { name:"eple", plural:"epler", art: svg(`
+  { name:"eple", plural:"epler", hue:"rød", art: svg(`
     <path d="M50 30 C33 17 10 28 13 54 C16 78 33 93 50 86 C67 93 84 78 87 54 C90 28 67 17 50 30 Z" fill="#EF4444" ${S}/>
     <path d="M50 30 Q51 19 57 11" fill="none" stroke="#7A4A2A" stroke-width="6" stroke-linecap="round"/>
     <path d="M55 21 Q66 9 80 14 Q71 28 55 21 Z" fill="#4CAF50" ${S}/>
     <ellipse cx="31" cy="48" rx="6" ry="11" fill="#fff" opacity=".55" transform="rotate(20 31 48)"/>`) },
-  { name:"stjerne", plural:"stjerner", art: svg(`
+  { name:"stjerne", plural:"stjerner", hue:"gul", art: svg(`
     <polygon points="${starPts(50,54,44,19)}" fill="#FFC933" ${S}/>
     <circle cx="42" cy="53" r="3.6" fill="${INK}"/><circle cx="58" cy="53" r="3.6" fill="${INK}"/>
     <circle cx="36" cy="61" r="4" fill="#FF8FA3" opacity=".7"/><circle cx="64" cy="61" r="4" fill="#FF8FA3" opacity=".7"/>
     <path d="M44 62 Q50 67 56 62" fill="none" stroke="${INK}" stroke-width="3.5" stroke-linecap="round"/>`) },
-  { name:"fisk", plural:"fisker", art: svg(`
+  { name:"fisk", plural:"fisker", hue:"blå", art: svg(`
     <path d="M36 28 Q48 11 63 29" fill="#3BA7E0" ${S}/>
     <path d="M72 50 L94 30 Q88 50 94 70 Z" fill="#3BA7E0" ${S}/>
     <ellipse cx="44" cy="50" rx="34" ry="24" fill="#5CC8F2" ${S}/>
@@ -212,16 +232,16 @@ const TYPES = [
     <circle cx="27" cy="45" r="7" fill="#fff" stroke="${INK}" stroke-width="3"/>
     <circle cx="25.5" cy="45" r="3.5" fill="${INK}"/>
     <path d="M12 55 Q16 58 21 55" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>`) },
-  { name:"ball", plural:"baller", art: svg(`
+  { name:"ball", plural:"baller", hue:"oransje", art: svg(`
     <circle cx="50" cy="50" r="40" fill="#FF8A3D" ${S}/>
     <path d="M50 10 L50 90 M10 50 L90 50 M22 22 Q40 50 22 78 M78 22 Q60 50 78 78" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>
     <ellipse cx="33" cy="31" rx="6" ry="9" fill="#fff" opacity=".5" transform="rotate(40 33 31)"/>`) },
-  { name:"blomst", plural:"blomster", art: svg(`
+  { name:"blomst", plural:"blomster", hue:"rosa", art: svg(`
     <path d="M50 58 Q47 78 50 96" fill="none" stroke="#3E9C47" stroke-width="6" stroke-linecap="round"/>
     <path d="M50 81 Q63 66 77 72 Q64 87 50 81 Z" fill="#5BBF5F" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>
     ${[0,60,120,180,240,300].map(a=>{const r=a*Math.PI/180;return `<circle cx="${(50+20*Math.cos(r)).toFixed(1)}" cy="${(40+20*Math.sin(r)).toFixed(1)}" r="14" fill="#FF8FC7" ${S}/>`;}).join("")}
     <circle cx="50" cy="40" r="13" fill="#FFD23F" ${S}/>`) },
-  { name:"sommerfugl", plural:"sommerfugler", art: svg(`
+  { name:"sommerfugl", plural:"sommerfugler", hue:"lilla", art: svg(`
     <ellipse cx="30" cy="36" rx="22" ry="20" fill="#A66CFF" ${S}/>
     <ellipse cx="70" cy="36" rx="22" ry="20" fill="#A66CFF" ${S}/>
     <ellipse cx="34" cy="67" rx="15" ry="15" fill="#F48FD1" ${S}/>
@@ -231,7 +251,7 @@ const TYPES = [
     <ellipse cx="50" cy="52" rx="7" ry="28" fill="${INK}"/>
     <path d="M47 27 Q40 13 34 10 M53 27 Q60 13 66 10" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>
     <circle cx="34" cy="10" r="3.5" fill="${INK}"/><circle cx="66" cy="10" r="3.5" fill="${INK}"/>`) },
-  { name:"marihøne", plural:"marihøner", art: svg(`
+  { name:"marihøne", plural:"marihøner", hue:"rød", art: svg(`
     <path d="M44 13 Q40 5 34 6 M56 13 Q60 5 66 6" fill="none" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>
     <circle cx="50" cy="27" r="16" fill="${INK}"/>
     <circle cx="44" cy="20" r="3" fill="#fff"/><circle cx="56" cy="20" r="3" fill="#fff"/>
@@ -240,19 +260,19 @@ const TYPES = [
     <circle cx="36" cy="46" r="6" fill="${INK}"/><circle cx="64" cy="46" r="6" fill="${INK}"/>
     <circle cx="31" cy="66" r="7" fill="${INK}"/><circle cx="69" cy="66" r="7" fill="${INK}"/>
     <circle cx="41" cy="82" r="5" fill="${INK}"/><circle cx="59" cy="82" r="5" fill="${INK}"/>`) },
-  { name:"bil", plural:"biler", art: svg(`
+  { name:"bil", plural:"biler", hue:"grønn", art: svg(`
     <path d="M26 48 L36 26 Q38 22 43 22 L62 22 Q67 22 69 26 L78 48 Z" fill="#22C3A6" ${S}/>
     <rect x="8" y="46" width="84" height="26" rx="12" fill="#22C3A6" ${S}/>
     <path d="M34 44 L41 28 L49 28 L49 44 Z M54 44 L54 28 L62 28 Q64 28 65 30 L71 44 Z" fill="#CFF3FF" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>
     <circle cx="30" cy="74" r="11" fill="${INK}"/><circle cx="30" cy="74" r="4.5" fill="#D7DEEA"/>
     <circle cx="70" cy="74" r="11" fill="${INK}"/><circle cx="70" cy="74" r="4.5" fill="#D7DEEA"/>
     <circle cx="87" cy="56" r="3.5" fill="#FFE066"/>`) },
-  { name:"jordbær", plural:"jordbær", art: svg(`
+  { name:"jordbær", plural:"jordbær", hue:"rød", art: svg(`
     <path d="M50 92 C28 84 12 60 16 42 C19 30 34 28 50 32 C66 28 81 30 84 42 C88 60 72 84 50 92 Z" fill="#FF4D6D" ${S}/>
     ${[[36,48],[50,46],[64,48],[29,61],[43,60],[57,60],[71,61],[40,73],[56,73],[48,83]].map(([x,y])=>`<ellipse cx="${x}" cy="${y}" rx="2.2" ry="3.5" fill="#FFE38A"/>`).join("")}
     <path d="M50 18 L50 8" stroke="#3E7D32" stroke-width="5" stroke-linecap="round"/>
     <path d="M28 32 L39 21 L45 29 L50 15 L55 29 L61 21 L72 32 Q50 41 28 32 Z" fill="#43A047" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`) },
-  { name:"sopp", plural:"sopper", art: svg(`
+  { name:"sopp", plural:"sopper", hue:"rød", art: svg(`
     <path d="M38 56 Q35 80 40 90 L60 90 Q65 80 62 56 Z" fill="#FFF2D6" ${S}/>
     <path d="M10 58 C10 28 30 12 50 12 C70 12 90 28 90 58 Q50 66 10 58 Z" fill="#E53935" ${S}/>
     <circle cx="30" cy="36" r="6" fill="#fff"/><circle cx="52" cy="25" r="7" fill="#fff"/>
@@ -266,8 +286,20 @@ const TROPHY = svg(`
   <circle cx="34" cy="61" r="4.5" fill="#FF8FA3" opacity=".7"/><circle cx="66" cy="61" r="4.5" fill="#FF8FA3" opacity=".7"/>
   <path d="M41 61 Q50 71 59 61" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>`);
 const CHECK = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+/* 11–15 får samme farge som 1–5 */
 const COLORS = ["#FF9A9A","#FFB870","#FFE066","#B8E986","#7CE0B8","#86D9F7","#9CBBFF","#C1A6FF","#F7A8DC","#FFC7AE"];
-const ROUNDS = 20;
+const ROUNDS = 10;
+
+const GAMES = {
+  telling:  { name:"Telling", desc:"Tell tingene og trykk på riktig tall.", buttons:10, capA:15, capB:0 },
+  addisjon: { name:"Addisjon", desc:"Tell tingene. Når det kommer flere, teller du videre.", buttons:10, capA:12, capB:8 },
+  tier:     { name:"Tieroverganger", desc:"Fyll opp tieren og tell videre forbi 10.", buttons:15, capA:12, capB:9 }
+};
+/* Vekter for det nye leddet b */
+const WEIGHT_B = {
+  addisjon: {1:.35, 2:.30, 3:.20, 4:.10, 5:.05},
+  tier:     {2:.25, 3:.25, 4:.20, 5:.15, 6:.10, 7:.05}
+};
 
 /* ---------- Elementer ---------- */
 const field = document.getElementById("field");
@@ -282,9 +314,8 @@ const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 document.getElementById("samples").innerHTML = [0,2,1].map(i => `<span>${TYPES[i].art}</span>`).join("");
 document.getElementById("trophy").innerHTML = TROPHY;
 
-/* Fremdrift: 20 stjerner i grupper på fem */
 const pstars = [];
-for (let g = 0; g < 4; g++){
+for (let g = 0; g < ROUNDS/5; g++){
   const grp = document.createElement("div");
   grp.className = "grp";
   for (let i = 0; i < 5; i++){
@@ -298,46 +329,101 @@ for (let g = 0; g < 4; g++){
   progress.appendChild(grp);
 }
 
-/* Tallknapper */
-const buttons = [];
-for (let n = 1; n <= 10; n++){
-  const b = document.createElement("button");
-  b.type = "button";
-  b.className = "num";
-  b.textContent = n;
-  b.style.setProperty("--c", COLORS[n-1]);
-  b.addEventListener("click", () => answer(n, b));
-  b.addEventListener("animationend", () => b.classList.remove("nope"));
-  pad.appendChild(b);
-  buttons.push(b);
-}
-
 /* ---------- Tilstand ---------- */
-let mode = "spredt", done = 0, cur = null, lastCount = 0, lastType = -1, locked = true, t0 = 0, timers = [];
+let game = "telling", view = "spredt";
+let plan = [], done = 0, cur = null, locked = true, t0 = 0, timers = [];
+let buttons = [];
 const later = (fn, ms) => timers.push(setTimeout(fn, ms));
 const clearTimers = () => { timers.forEach(clearTimeout); timers = []; };
 function shuffle(a){ for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; }
+const range = n => [...Array(n).keys()];
 
-function setMode(m){
-  mode = m;
-  document.querySelectorAll("[data-mode]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.mode === m)));
-  if (cur) render(false);
+function setView(v){
+  view = v;
+  document.querySelectorAll("[data-view]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
+  if (cur) render(false, false);
 }
-document.querySelectorAll("[data-mode]").forEach(b => b.addEventListener("click", () => setMode(b.dataset.mode)));
+function setGame(g){
+  game = g;
+  document.querySelectorAll("[data-game]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.game === g)));
+  document.getElementById("gameDesc").textContent = GAMES[g].desc;
+  if (g === "tier") setView("ramme");
+}
+document.querySelectorAll("[data-view]").forEach(b => b.addEventListener("click", () => setView(b.dataset.view)));
+document.querySelectorAll("[data-game]").forEach(b => b.addEventListener("click", () => setGame(b.dataset.game)));
+
+function buildPad(){
+  pad.innerHTML = "";
+  buttons = [];
+  const n = GAMES[game].buttons;
+  pad.classList.toggle("three", n === 15);
+  for (let k = 1; k <= n; k++){
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "num";
+    b.textContent = k;
+    b.style.setProperty("--c", COLORS[(k-1) % 10]);
+    b.addEventListener("click", () => answer(k, b));
+    b.addEventListener("animationend", () => b.classList.remove("nope"));
+    pad.appendChild(b);
+    buttons.push(b);
+  }
+}
 
 function updateProgress(animateLast){
-  pstars.forEach((s, i) => {
-    s.classList.toggle("on", i < done);
-    s.classList.remove("pop");
-  });
+  pstars.forEach((s, i) => { s.classList.toggle("on", i < done); s.classList.remove("pop"); });
   if (animateLast && done > 0){ void pstars[done-1].getBoundingClientRect(); pstars[done-1].classList.add("pop"); }
   progress.setAttribute("aria-label", `${done} av ${ROUNDS} runder`);
+}
+
+/* ---------- Plan for de 10 rundene ---------- */
+function allPairs(g){
+  const out = [];
+  if (g === "addisjon"){
+    for (let b = 1; b <= 5; b++) for (let a = b; a + b <= 10; a++) out.push({a, b});
+  } else {
+    for (let a = 6; a <= 9; a++) for (let b = 1; b <= a; b++) if (a + b >= 11 && a + b <= 15) out.push({a, b});
+  }
+  const countB = {};
+  out.forEach(p => countB[p.b] = (countB[p.b] || 0) + 1);
+  out.forEach(p => p.w = WEIGHT_B[g][p.b] / countB[p.b]);
+  return out;
+}
+function pickWeighted(pool){
+  const total = pool.reduce((s, p) => s + p.w, 0);
+  let r = Math.random()*total;
+  for (let i = 0; i < pool.length; i++){ r -= pool[i].w; if (r <= 0) return i; }
+  return pool.length - 1;
+}
+function pickTypeB(typeA, prevB){
+  let opts = range(TYPES.length).filter(t => TYPES[t].hue !== TYPES[typeA].hue && t !== prevB);
+  if (!opts.length) opts = range(TYPES.length).filter(t => t !== typeA);
+  return opts[Math.floor(Math.random()*opts.length)];
+}
+function buildPlan(){
+  const types = shuffle(range(TYPES.length));
+  plan = [];
+  if (game === "telling"){
+    const counts = shuffle(range(10).map(i => i + 1));
+    for (let i = 0; i < ROUNDS; i++) plan.push({ a:counts[i], b:0, typeA:types[i], typeB:-1 });
+  } else {
+    const pool = allPairs(game);
+    let prevB = -1;
+    for (let i = 0; i < ROUNDS; i++){
+      const p = pool.splice(pickWeighted(pool), 1)[0];
+      const typeB = pickTypeB(types[i], prevB);
+      prevB = typeB;
+      plan.push({ a:p.a, b:p.b, typeA:types[i], typeB });
+    }
+  }
 }
 
 /* ---------- Runder ---------- */
 function startGame(){
   clearTimers();
-  done = 0; lastCount = 0; lastType = -1;
+  done = 0;
+  buildPad();
+  buildPlan();
   updateProgress(false);
   startScreen.hidden = true;
   finishScreen.hidden = true;
@@ -345,74 +431,123 @@ function startGame(){
   newRound();
 }
 
+function jitter(n){ return range(n).map(() => ({ jx:Math.random()*2-1, jy:Math.random()*2-1, rot:Math.random()*30-15, sc:.9 + Math.random()*.15 })); }
+
 function newRound(){
-  let c, t;
-  do { c = 1 + Math.floor(Math.random()*10); } while (c === lastCount);
-  do { t = Math.floor(Math.random()*TYPES.length); } while (t === lastType);
-  lastCount = c; lastType = t;
-  const cells = shuffle([...Array(15).keys()]).slice(0, c);
-  const jit = cells.map(() => ({ jx: Math.random()*2-1, jy: Math.random()*2-1, rot: Math.random()*30-15, sc: .9 + Math.random()*.15 }));
-  cur = { count:c, type:t, cells, jit, counted:new Set() };
+  const r = plan[done], G = GAMES[game];
+  cur = { ...r, phase:1,
+    cellsA: shuffle(range(G.capA)).slice(0, r.a), jitA: jitter(r.a),
+    cellsB: shuffle(range(Math.max(G.capB,1))).slice(0, r.b), jitB: jitter(r.b),
+    counted: new Set() };
   field.classList.remove("leaving");
+  question.classList.remove("leaving");
   badge.classList.remove("show");
   badge.innerHTML = "";
   buttons.forEach(b => b.classList.remove("right","nope"));
-  render(true);
-  question.textContent = `Hvor mange ${TYPES[t].plural}?`;
+  render(true, false);
+  question.textContent = `Hvor mange ${TYPES[r.typeA].plural}?`;
   locked = false;
 }
 
-function makeObj(i, animate){
+function makeObj(group, i, animate){
+  const t = group === "A" ? cur.typeA : cur.typeB;
+  const key = group + i;
   const b = document.createElement("button");
   b.type = "button";
-  b.className = "obj" + (animate ? "" : " still") + (cur.counted.has(i) ? " counted" : "");
-  b.dataset.i = i;
-  b.setAttribute("aria-pressed", String(cur.counted.has(i)));
-  b.setAttribute("aria-label", TYPES[cur.type].name);
-  b.innerHTML = `<span class="bob"><span class="art" style="--d:${animate ? i*70 : 0}ms">${TYPES[cur.type].art}</span></span><span class="check" aria-hidden="true">${CHECK}</span>`;
+  let cls = "obj";
+  if (!animate) cls += " still";
+  if (cur.counted.has(key)) cls += " counted";
+  if (group === "A" && cur.phase === 2) cls += " prev";
+  b.className = cls;
+  b.dataset.k = key;
+  b.setAttribute("aria-pressed", String(cur.counted.has(key)));
+  b.setAttribute("aria-label", TYPES[t].name);
+  const delay = animate ? (group === "A" ? i*70 : 150 + i*120) : 0;
+  b.innerHTML = `<span class="bob"><span class="art" style="--d:${delay}ms">${TYPES[t].art}</span></span><span class="check" aria-hidden="true">${CHECK}</span>`;
   return b;
 }
 
-function render(animate){
+function bestGrid(rw, rh, cap){
+  let best = { cols:1, rows:cap, s:0 };
+  for (let c = 1; c <= cap; c++){
+    const r = Math.ceil(cap/c), s = Math.min(rw/c, rh/r);
+    if (s > best.s) best = { cols:c, rows:r, s };
+  }
+  return best;
+}
+
+function render(animA, animB){
   const old = field.querySelector(".layer");
   if (old) old.remove();
   const layer = document.createElement("div");
   layer.className = "layer";
   const w = field.clientWidth, h = field.clientHeight;
+  const G = GAMES[game];
+  const showB = cur.phase === 2 && cur.b > 0;
 
-  if (mode === "spredt"){
-    const ratio = w / h;
-    const [cols, rows] = ratio > 1.25 ? [5,3] : ratio < 0.8 ? [3,5] : [4,4];
-    const cw = w/cols, ch = h/rows;
-    const base = Math.min(Math.min(cw, ch)*0.74, 170);
-    cur.cells.forEach((c, i) => {
-      const j = cur.jit[i], size = base*j.sc;
-      const col = c % cols, row = Math.floor(c / cols);
+  if (view === "spredt"){
+    const regions = [];
+    if (game === "telling"){
+      regions.push({ x:0, y:0, w, h, cap:G.capA });
+    } else {
+      const fa = G.capA / (G.capA + G.capB);
+      if (w >= h*0.9){
+        const gap = w*0.04, wa = (w - gap)*fa;
+        regions.push({ x:0, y:0, w:wa, h, cap:G.capA }, { x:wa + gap, y:0, w:w - wa - gap, h, cap:G.capB });
+      } else {
+        const gap = h*0.04, ha = (h - gap)*fa;
+        regions.push({ x:0, y:0, w, h:ha, cap:G.capA }, { x:0, y:ha + gap, w, h:h - ha - gap, cap:G.capB });
+      }
+    }
+    regions.forEach(rg => rg.grid = bestGrid(rg.w, rg.h, rg.cap));
+    const base = Math.min(Math.min(...regions.map(rg => rg.grid.s))*0.76, 160);
+    const place = (o, rg, cell, j) => {
+      const cw = rg.w/rg.grid.cols, ch = rg.h/rg.grid.rows, size = base*j.sc;
+      const col = cell % rg.grid.cols, row = Math.floor(cell / rg.grid.cols);
       const fx = cw - size, fy = ch - size;
-      const o = makeObj(i, animate);
       o.style.width = o.style.height = size + "px";
-      o.style.left = (col*cw + fx/2 + j.jx*fx*0.4) + "px";
-      o.style.top = (row*ch + fy/2 + j.jy*fy*0.4) + "px";
+      o.style.left = (rg.x + col*cw + fx/2 + j.jx*fx*0.4) + "px";
+      o.style.top = (rg.y + row*ch + fy/2 + j.jy*fy*0.4) + "px";
       o.style.setProperty("--rot", j.rot + "deg");
       layer.appendChild(o);
-    });
+    };
+    cur.cellsA.forEach((c, i) => place(makeObj("A", i, animA), regions[0], c, cur.jitA[i]));
+    if (showB) cur.cellsB.forEach((c, i) => place(makeObj("B", i, animB), regions[1], c, cur.jitB[i]));
   } else {
-    const horizontal = w >= h*0.9;
-    const cols = horizontal ? 5 : 2, rows = horizontal ? 2 : 5;
-    const s = Math.floor(Math.min((w*0.92 - 8 - (cols-1)*4)/cols, (h*0.88 - 8 - (rows-1)*4)/rows, 160));
-    const frame = document.createElement("div");
-    frame.className = "frame";
-    frame.style.gridTemplateColumns = `repeat(${cols}, ${s}px)`;
-    frame.style.gridAutoRows = s + "px";
-    for (let i = 0; i < 10; i++){
-      const cell = document.createElement("div");
-      cell.className = "cell";
-      cell.style.gridRow = horizontal ? Math.floor(i/5) + 1 : (i % 5) + 1;
-      cell.style.gridColumn = horizontal ? (i % 5) + 1 : Math.floor(i/5) + 1;
-      if (i < cur.count) cell.appendChild(makeObj(i, animate));
-      frame.appendChild(cell);
+    const double = game === "tier";
+    const W = w*0.92, H = h*0.88, GAP = 14;
+    const opts = double ? [
+      { dir:"row",    orient:"h", s:Math.min((W - 48 - GAP)/10, (H - 12)/2) },
+      { dir:"column", orient:"h", s:Math.min((W - 24)/5, (H - 24 - GAP)/4) },
+      { dir:"row",    orient:"v", s:Math.min((W - 24 - GAP)/4, (H - 24)/5) }
+    ] : [
+      { dir:"row", orient:"h", s:Math.min((W - 24)/5, (H - 12)/2) },
+      { dir:"row", orient:"v", s:Math.min((W - 12)/2, (H - 24)/5) }
+    ];
+    const best = opts.reduce((m, o) => o.s > m.s ? o : m);
+    const s = Math.max(20, Math.floor(Math.min(best.s, 150)));
+    const wrap = document.createElement("div");
+    wrap.className = "frames";
+    wrap.style.flexDirection = best.dir;
+    const horizontal = best.orient === "h";
+    for (let f = 0; f < (double ? 2 : 1); f++){
+      const frame = document.createElement("div");
+      frame.className = "frame";
+      frame.style.gridTemplateColumns = `repeat(${horizontal ? 5 : 2}, ${s}px)`;
+      frame.style.gridAutoRows = s + "px";
+      for (let l = 0; l < 10; l++){
+        const i = f*10 + l;
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        cell.style.gridRow = horizontal ? Math.floor(l/5) + 1 : (l % 5) + 1;
+        cell.style.gridColumn = horizontal ? (l % 5) + 1 : Math.floor(l/5) + 1;
+        if (i < cur.a) cell.appendChild(makeObj("A", i, animA));
+        else if (showB && i < cur.a + cur.b) cell.appendChild(makeObj("B", i - cur.a, animB));
+        frame.appendChild(cell);
+      }
+      wrap.appendChild(frame);
     }
-    layer.appendChild(frame);
+    layer.appendChild(wrap);
   }
   field.insertBefore(layer, badge);
 }
@@ -421,41 +556,81 @@ function render(animate){
 field.addEventListener("click", e => {
   const o = e.target.closest(".obj");
   if (!o || !cur) return;
-  const i = Number(o.dataset.i);
-  if (cur.counted.has(i)) cur.counted.delete(i); else cur.counted.add(i);
-  const on = cur.counted.has(i);
+  const k = o.dataset.k;
+  if (cur.counted.has(k)) cur.counted.delete(k); else cur.counted.add(k);
+  const on = cur.counted.has(k);
   o.classList.toggle("counted", on);
   o.setAttribute("aria-pressed", String(on));
 });
 
+/* Regnestykket */
+function showEquationStart(){
+  question.innerHTML = `<div class="eq" aria-label="${cur.a} pluss ${cur.b} er lik">
+    <span class="t">${cur.a}</span>
+    <span class="t wait">+</span>
+    <span class="t wait">${cur.b}</span>
+    <span class="t wait">=</span>
+    <span class="t wait ans"></span></div>`;
+}
+function showEquationRest(){
+  question.querySelectorAll(".t.wait").forEach((el, i) => {
+    el.style.setProperty("--d", (i*110) + "ms");
+    el.classList.remove("wait");
+  });
+}
+function fillEquation(sum){
+  const ans = question.querySelector(".ans");
+  if (!ans) return;
+  ans.innerHTML = `<b>${sum}</b>`;
+  ans.classList.add("filled");
+}
+
 function answer(n, btn){
-  if (locked || !cur) return;
-  if (n === cur.count){
-    locked = true;
-    btn.classList.add("right");
-    done++;
-    updateProgress(true);
-    celebrate(btn);
-    if (done >= ROUNDS){
-      const ms = performance.now() - t0;
-      later(() => finish(ms), 1700);
-    } else {
-      later(() => field.classList.add("leaving"), 2650);
-      later(newRound, 3000);
-    }
-  } else {
+  if (locked || !cur || !btn) return;
+  const twoStep = game !== "telling";
+  const target = cur.phase === 1 ? cur.a : cur.a + cur.b;
+  if (n !== target){
     btn.classList.remove("nope");
     void btn.offsetWidth;
     btn.classList.add("nope");
+    return;
+  }
+  locked = true;
+  btn.classList.add("right");
+
+  if (twoStep && cur.phase === 1){
+    field.querySelectorAll(".obj").forEach(o => o.classList.add("hop1"));
+    showEquationStart();
+    later(() => {
+      cur.phase = 2;
+      buttons.forEach(b => b.classList.remove("right"));
+      render(false, true);
+      showEquationRest();
+      locked = false;
+    }, 1100);
+    return;
+  }
+
+  if (twoStep) fillEquation(target);
+  done++;
+  updateProgress(true);
+  celebrate(btn, target);
+  if (done >= ROUNDS){
+    const ms = performance.now() - t0;
+    later(() => finish(ms), 1800);
+  } else {
+    later(() => { field.classList.add("leaving"); question.classList.add("leaving"); }, 2650);
+    later(newRound, 3000);
   }
 }
 
-function celebrate(btn){
+function celebrate(btn, number){
   field.querySelectorAll(".obj").forEach((o, i) => {
-    o.style.setProperty("--hd", (i*60) + "ms");
+    o.classList.remove("hop1");
+    o.style.setProperty("--hd", (i*50) + "ms");
     o.classList.add("hop");
   });
-  badge.innerHTML = `<div class="medal">${MEDAL}<span>${cur.count}</span></div>`;
+  badge.innerHTML = `<div class="medal">${MEDAL}<span>${number}</span></div>`;
   void badge.offsetWidth;
   badge.classList.add("show");
   const r = btn.getBoundingClientRect();
@@ -472,28 +647,44 @@ function formatTime(ms){
 }
 
 function finish(ms){
-  document.getElementById("timeText").textContent = formatTime(ms);
+  document.getElementById("finishText").innerHTML = `${GAMES[game].name}. Tiden din: <strong>${formatTime(ms)}</strong>`;
   finishScreen.hidden = false;
   document.getElementById("againBtn").focus();
   rain(170);
 }
 
+function openMenu(){
+  clearTimers();
+  locked = true;
+  finishScreen.hidden = true;
+  startScreen.hidden = false;
+  document.getElementById("startBtn").focus();
+}
+
 document.getElementById("startBtn").addEventListener("click", startGame);
 document.getElementById("againBtn").addEventListener("click", startGame);
+document.getElementById("switchBtn").addEventListener("click", openMenu);
+document.getElementById("menuBtn").addEventListener("click", openMenu);
 
-/* Tastatur: 1–9, og 0 for 10 */
+/* Tastatur: 1–9, 0 = 10. I Tieroverganger: «1» fulgt av 0–5 gir 10–15. */
+let kbuf = false, ktimer = 0;
 document.addEventListener("keydown", e => {
   if (!startScreen.hidden || !finishScreen.hidden) return;
-  if (/^[0-9]$/.test(e.key)){
-    const n = e.key === "0" ? 10 : Number(e.key);
-    answer(n, buttons[n-1]);
+  if (!/^[0-9]$/.test(e.key)) return;
+  const d = Number(e.key);
+  const press = n => answer(n, buttons[n-1]);
+  if (game === "tier"){
+    if (kbuf && d <= 5){ clearTimeout(ktimer); kbuf = false; press(10 + d); return; }
+    if (kbuf){ clearTimeout(ktimer); kbuf = false; press(1); }
+    if (d === 1){ kbuf = true; ktimer = setTimeout(() => { kbuf = false; press(1); }, 700); return; }
   }
+  press(d === 0 ? 10 : d);
 });
 
 let rz = 0;
 window.addEventListener("resize", () => {
   cancelAnimationFrame(rz);
-  rz = requestAnimationFrame(() => { sizeCanvas(); if (cur) render(false); });
+  rz = requestAnimationFrame(() => { sizeCanvas(); if (cur) render(false, false); });
 });
 
 /* ---------- Konfetti ---------- */
