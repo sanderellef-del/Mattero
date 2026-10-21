@@ -1,1 +1,204 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Escape Room – Oppgaver</title>
+  <style>
+    body{
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      margin: 24px;
+      line-height: 1.35;
+      max-width: 900px;
+    }
+    #wrap{
+      display: grid;
+      gap: 14px;
+    }
+    #imgBox img{
+      max-width: 100%;
+      height: auto;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 8px;
+      background: #fff;
+    }
+    .row{
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    input[type="text"]{
+      padding: 10px 12px;
+      font-size: 16px;
+      min-width: 240px;
+      border: 1px solid #bbb;
+      border-radius: 10px;
+    }
+    button{
+      padding: 10px 14px;
+      font-size: 16px;
+      border: 1px solid #444;
+      border-radius: 10px;
+      background: #f5f5f5;
+      cursor: pointer;
+    }
+    button:hover{ background:#eee; }
+    #msg{
+      min-height: 1.2em;
+      font-weight: 600;
+    }
+    .ok{ color: #137333; }
+    .bad{ color: #b00020; }
+    #progress{
+      color:#444;
+      font-size: 14px;
+    }
+    #done{
+      display:none;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid #cfe9d6;
+      background: #f2fbf5;
+    }
+  </style>
+</head>
+<body>
+  <div id="wrap">
+    <h1>Escape Room – Oppgaver</h1>
+    <div id="progress"></div>
 
+    <div id="imgBox"></div>
+
+    <div id="inputBox" class="row">
+      <label for="answer"><strong>Svar:</strong></label>
+      <input id="answer" type="text" autocomplete="off" />
+      <button id="submitBtn" type="button">Send inn</button>
+    </div>
+
+    <div id="msg"></div>
+
+    <div id="done">
+      <h2>🎉 Ferdig!</h2>
+      <p>Du klarte alle oppgavene. Bra jobba!</p>
+    </div>
+  </div>
+
+  <script>
+    // Folder name (case sensitive!)
+    const IMG_FOLDER = "Oppgavebilder2";
+
+    
+    
+    
+    
+    
+    
+    // Correct answers for Oppgave 1..20
+    // Note: comparison is case-insensitive and trims spaces.
+    const answers = [
+      "a",
+      "4",
+      "11",
+      "7",
+      "9",
+      "9",
+      "7",
+      "6",
+      "15",
+      "1",
+      "2",
+      "4",
+      "14",
+      "3",
+      "9",
+      "8",
+      "5",
+      "3",
+      "15",
+      "-4"
+    ];
+
+    let current = 1; // starts at Oppgave 1
+
+    const imgBox = document.getElementById("imgBox");
+    const progress = document.getElementById("progress");
+    const answerInput = document.getElementById("answer");
+    const submitBtn = document.getElementById("submitBtn");
+    const msg = document.getElementById("msg");
+    const inputBox = document.getElementById("inputBox");
+    const doneBox = document.getElementById("done");
+
+    function setMessage(text, ok) {
+      msg.textContent = text;
+      msg.className = ok ? "ok" : "bad";
+    }
+
+    function renderCurrent() {
+      progress.textContent = `Oppgave ${current} av ${answers.length}`;
+
+      // Replace the whole image area (so the previous image disappears)
+      imgBox.innerHTML = "";
+
+      const img = document.createElement("img");
+      img.alt = `Oppgave ${current}`;
+      img.src = `${IMG_FOLDER}/prob${current}.png`;
+
+      img.onerror = () => {
+        setMessage(
+          `Finner ikke bildet: ${IMG_FOLDER}/prob${current}.png (sjekk filnavn og mappe-navn)`,
+          false
+        );
+      };
+
+      imgBox.appendChild(img);
+
+      // Reset input/message
+      answerInput.value = "";
+      answerInput.focus();
+      msg.textContent = "";
+      msg.className = "";
+    }
+
+    function normalize(s) {
+      return String(s).trim().toLowerCase();
+    }
+
+    function checkAnswer() {
+      const user = normalize(answerInput.value);
+      const correct = normalize(answers[current - 1]);
+
+      if (user === correct) {
+        setMessage("Riktig! 🎉", true);
+        current++;
+
+        if (current > answers.length) {
+          // Finished
+          progress.textContent = `Oppgave ${answers.length} av ${answers.length}`;
+          imgBox.innerHTML = "";
+          inputBox.style.display = "none";
+          msg.textContent = "";
+          doneBox.style.display = "block";
+          return;
+        }
+
+        // Small delay so they see "Riktig!" before next problem appears
+        setTimeout(renderCurrent, 300);
+      } else {
+        setMessage("Feil svar. Prøv igjen.", false);
+        answerInput.select();
+        answerInput.focus();
+      }
+    }
+
+    submitBtn.addEventListener("click", checkAnswer);
+    answerInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") checkAnswer();
+    });
+
+    // Start
+    renderCurrent();
+  </script>
+</body>
+</html>
