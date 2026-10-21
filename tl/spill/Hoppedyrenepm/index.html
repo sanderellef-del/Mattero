@@ -1,0 +1,977 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Hoppedyrene pluss og minus</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Fredoka:wght@500;600;700&display=swap">
+<style>
+/* Layout: chunky toy-like panels on a pale sky; the collected animals stand on the top edge of the number-line panel and watch. One light look for every classroom device. */
+:root{
+  --sky:#E3F1F9;
+  --paper:#FFFFFF;
+  --ink:#1D2B4F;
+  --ink-soft:#56668A;
+  --rule:#C5D8E6;
+  --sil:#BFD0DE;
+  --sun:#FFC83A;
+  --sun-deep:#D69A00;
+  --hop:#2F7FE0;
+  --hop2:#E0457B;
+  --good:#22A15E;
+  --good-deep:#17804A;
+  --good-soft:#DCF4E6;
+  --try:#EF8418;
+  --try-deep:#A65400;
+  --try-soft:#FFEBD4;
+  --f-play:"Fredoka","Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --f-read:"Andika","Verdana",system-ui,sans-serif;
+  color-scheme:light;
+}
+html,body{background:var(--sky);color:var(--ink)}
+body{font-family:var(--f-read);font-size:16px;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit}
+button:focus-visible{outline:4px solid var(--hop);outline-offset:3px}
+
+.app{max-width:1100px;margin:0 auto;padding-block:14px 32px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px))}
+
+/* Dyrene */
+.eye{transform-box:fill-box;transform-origin:center;animation:eyeblink 5.2s infinite;animation-delay:var(--bd,0s)}
+.sil *{fill:var(--sil)!important;stroke:var(--sil)!important}
+.sil .eye{animation:none}
+.q{font:700 46px var(--f-play);fill:#fff;text-anchor:middle}
+
+/* ---------- Startskjerm ---------- */
+.start{padding-top:clamp(12px,4vh,44px)}
+.wordmark{font:700 clamp(42px,8vw,84px)/1 var(--f-play);margin:0;letter-spacing:-.01em;text-wrap:balance}
+.wordmark span{color:var(--hop)}
+.hero-row{display:flex;align-items:flex-end;gap:clamp(4px,1.5vw,16px);margin-top:18px;border-bottom:5px solid var(--ink);padding-bottom:0;width:max-content;max-width:100%}
+.hero-row svg{width:clamp(56px,11vw,96px);height:auto;display:block;overflow:visible}
+.hero-row .now{animation:idlehop 3.2s ease-in-out infinite;transform-origin:50% 100%}
+.lead{font-size:22px;color:var(--ink-soft);margin:.7em 0 .2em}
+.modes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-top:22px}
+@media (max-width:900px){.modes{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.mode-card{display:flex;flex-direction:column;align-items:flex-start;gap:10px;text-align:left;
+  padding:22px 24px 20px;background:var(--paper);border:3px solid var(--rule);border-radius:28px;
+  box-shadow:0 7px 0 var(--rule);cursor:pointer;transition:transform .15s ease, box-shadow .15s ease;min-width:0}
+.mode-card:hover{transform:translateY(-3px);box-shadow:0 10px 0 var(--rule)}
+.mode-card:active{transform:translateY(5px);box-shadow:0 2px 0 var(--rule)}
+.mode-name{font:700 clamp(28px,4vw,36px)/1.1 var(--f-play)}
+.mode-ex{font:600 clamp(44px,6vw,60px)/1 var(--f-play);display:flex;gap:.25em}
+.mode-ex .b{color:var(--hop)}
+.mode-ex .a{text-decoration:underline .12em var(--sun);text-underline-offset:.1em;text-decoration-skip-ink:none}
+.mini{width:100%;height:auto;display:block}
+.mode-note{font-size:18px;color:var(--ink-soft)}
+.mini-axis,.mini-tick{stroke:var(--ink);stroke-linecap:round}
+.mini-axis{stroke-width:2.5}
+.mini-tick{stroke-width:1.6}
+.mini-tick.ten{stroke-width:2.6}
+.mini-arrow{fill:none;stroke:var(--ink);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.mini-arc{fill:none;stroke:var(--hop);stroke-width:2.2;stroke-linecap:round}
+.mini-arc.after{stroke:var(--hop2)}
+.mini-lbl{font:600 11px var(--f-play);fill:var(--ink-soft);text-anchor:middle}
+.dot-start{fill:var(--sun)}
+.dot-end{fill:var(--good)}
+
+/* ---------- Spillskjerm ---------- */
+.bar{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.bar > .back,.bar > .mode-pill,.bar > .stars{margin-bottom:12px}
+.back{font:600 18px var(--f-play);background:var(--paper);border:3px solid var(--rule);border-radius:999px;padding:7px 16px 7px 12px;cursor:pointer}
+.back:disabled{opacity:.45;cursor:default}
+.mode-pill{font:600 18px var(--f-play);background:var(--ink);color:#fff;border-radius:999px;padding:8px 16px}
+.tribune-wrap{margin-left:auto;display:flex;justify-content:flex-end;min-width:0}
+#tribune{height:92px;width:auto;display:block;overflow:visible}
+#tribune [data-pick]{cursor:pointer}
+.fan{transform-box:fill-box;transform-origin:50% 100%}
+.fan.cheer{animation:cheer .6s cubic-bezier(.3,1.6,.5,1) both;animation-delay:var(--cd,0ms)}
+.fan.arrive{animation:arrive .7s cubic-bezier(.3,1.7,.5,1) both}
+.stars{display:flex;align-items:center;gap:8px;background:var(--paper);border:3px solid var(--rule);
+  border-radius:999px;padding:5px 16px 5px 10px;font:700 30px/1 var(--f-play);font-variant-numeric:tabular-nums}
+.star-ico{width:36px;height:36px;fill:var(--sun);stroke:var(--sun-deep);stroke-width:1.4;stroke-linejoin:round}
+.stars.bump{animation:bump .5s cubic-bezier(.3,1.8,.5,1)}
+.pips{display:flex;gap:3px;margin-left:6px;padding-left:10px;border-left:2px solid var(--rule)}
+.pips svg{width:17px;height:17px;fill:transparent;stroke:var(--sil);stroke-width:2;stroke-linejoin:round;transition:fill .25s, stroke .25s}
+.pips svg.on{fill:var(--sun);stroke:var(--sun-deep);animation:bump .45s cubic-bezier(.3,1.8,.5,1)}
+
+.line-panel{background:var(--paper);border:3px solid var(--rule);border-radius:28px;
+  box-shadow:0 6px 0 var(--rule);padding:30px 14px 4px}
+#line{display:block;width:100%;height:auto;overflow:visible}
+.nl-axis{stroke:var(--ink);stroke-width:6;stroke-linecap:round}
+.nl-arrow{fill:none;stroke:var(--ink);stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+.nl-tick{stroke:var(--ink);stroke-width:4;stroke-linecap:round}
+.nl-tick.ten{stroke-width:6}
+.nl-num{font-family:var(--f-play);font-weight:600;fill:var(--ink);text-anchor:middle;transition:fill .2s}
+.nl-num.ten{font-weight:700}
+.nl-num.on-end{fill:#fff}
+.mark{transform-box:fill-box;transform-origin:center;animation:markpop .45s cubic-bezier(.3,1.7,.5,1) both}
+.mark.start{fill:var(--sun)}
+.mark.end{fill:var(--good)}
+.arc{fill:none;stroke:var(--hop);stroke-width:5;stroke-linecap:round}
+.arc.after{stroke:var(--hop2)}
+.hopnum{font-family:var(--f-play);font-weight:600;fill:var(--hop);text-anchor:middle;opacity:0;transition:opacity .2s}
+.hopnum.after{fill:var(--hop2)}
+.hopnum.show{opacity:1}
+#line.hint10 .nl-tick.ten{animation:tentick 0.9s ease-in-out infinite alternate}
+#line.hint10 .nl-num.ten{animation:tennum 0.9s ease-in-out infinite alternate}
+.roo-bob{transform-box:fill-box;transform-origin:50% 100%;animation:breathe 2.6s ease-in-out infinite}
+
+.play{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:start;margin-top:22px}
+.task-col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.task-card{min-height:178px;display:grid;place-items:center;background:var(--paper);border:3px solid var(--rule);
+  border-radius:28px;box-shadow:0 6px 0 var(--rule);padding:20px}
+.idle-msg{margin:0;font-size:22px;color:var(--ink-soft);text-align:center;animation:fadein .4s ease both}
+.idle-msg b{font-family:var(--f-play);font-weight:600;color:var(--ink)}
+.idle-msg small{display:block;font-size:17px;margin-top:8px}
+.expr{display:flex;align-items:center;gap:.26em;font:600 clamp(52px,9vw,96px)/1 var(--f-play)}
+.tok{display:inline-block;animation:tokin .55s cubic-bezier(.3,1.6,.5,1) both;animation-delay:var(--d,0ms)}
+.tok.op{color:var(--ink-soft)}
+.tok.a{text-decoration:underline .11em var(--sun);text-underline-offset:.1em;text-decoration-skip-ink:none}
+.tok.b{color:var(--hop)}
+.answer{display:inline-flex;align-items:center;justify-content:center;min-width:1.75em;height:1.3em;padding:0 .14em;
+  border:4px dashed var(--ink-soft);border-radius:.22em;background:#F5F9FC;font-variant-numeric:tabular-nums}
+.answer.has{border-style:solid;border-color:var(--ink);background:var(--paper)}
+.answer .digits{display:inline-block;transition:opacity .25s, transform .25s}
+.caret{display:inline-block;width:5px;height:.78em;margin-left:3px;border-radius:3px;background:var(--hop);animation:blink 1.1s steps(2,start) infinite}
+.answer.right{border-style:solid;border-color:var(--good);background:var(--good-soft);color:var(--good-deep);animation:pop .5s cubic-bezier(.3,1.8,.5,1)}
+.answer.wrong{border-style:solid;border-color:var(--try);background:var(--try-soft);color:var(--try-deep);animation:shake .5s ease}
+.answer.fade .digits{opacity:0;transform:translateY(14px) scale(.6)}
+.answer.nudge{animation:nudge .3s ease}
+
+.feedback{min-height:3.6em;display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+.pill{display:inline-block;font:600 24px/1.2 var(--f-play);padding:6px 18px;border-radius:999px;border:3px solid;animation:pillin .4s cubic-bezier(.3,1.7,.5,1) both}
+.pill.try{background:var(--try-soft);border-color:var(--try);color:var(--try-deep)}
+.pill.good{background:var(--good-soft);border-color:var(--good);color:var(--good-deep)}
+.hint{margin:0;font-size:19px;line-height:1.45;max-width:36em;animation:fadein .4s ease both}
+
+.new-btn{align-self:flex-start;font:600 28px/1 var(--f-play);padding:18px 34px;background:var(--sun);color:var(--ink);
+  border:3px solid var(--sun-deep);border-radius:999px;box-shadow:0 6px 0 var(--sun-deep);cursor:pointer;transition:opacity .2s}
+.new-btn:active:not(:disabled){transform:translateY(5px);box-shadow:0 1px 0 var(--sun-deep)}
+.new-btn:disabled{opacity:.35;cursor:default}
+.new-btn.pulse:not(:disabled){animation:pulse 1.7s ease-in-out infinite}
+
+.pad{display:grid;grid-template-columns:repeat(3,76px);gap:12px}
+.key{height:66px;font:600 32px/1 var(--f-play);background:var(--paper);border:3px solid var(--rule);border-radius:18px;
+  box-shadow:0 5px 0 var(--rule);cursor:pointer;touch-action:manipulation;transition:opacity .2s}
+.key:active:not(:disabled){transform:translateY(4px);box-shadow:0 1px 0 var(--rule)}
+.key.del{color:var(--ink-soft);font-size:26px}
+.key.ok{background:var(--good);border-color:var(--good-deep);box-shadow:0 5px 0 var(--good-deep);color:#fff;font-size:26px}
+.key.ok:active:not(:disabled){box-shadow:0 1px 0 var(--good-deep)}
+.pad.off .key{opacity:.4;cursor:default}
+
+/* Feiring */
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:40}
+.flystar{position:fixed;left:0;top:0;width:48px;height:48px;pointer-events:none;z-index:50}
+.flystar svg{width:100%;height:100%;fill:var(--sun);stroke:var(--sun-deep);stroke-width:1.4;stroke-linejoin:round}
+.banner{position:fixed;left:50%;top:calc(env(safe-area-inset-top, 0px) + 40%);z-index:45;transform:translate(-50%,-50%) scale(.6);
+  opacity:0;pointer-events:none;background:var(--paper);border:4px solid var(--sun-deep);border-radius:32px;box-shadow:0 8px 0 var(--sun-deep);
+  padding:20px 34px 22px;text-align:center;transition:opacity .25s, transform .35s cubic-bezier(.3,1.7,.5,1);width:max-content;max-width:calc(100vw - 32px)}
+.banner.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.banner-art{display:flex;justify-content:center;align-items:flex-end;gap:6px;margin-bottom:6px}
+.banner-art svg{height:clamp(70px,14vw,130px);width:auto;overflow:visible}
+.banner-art.row svg{height:clamp(46px,9vw,84px)}
+.banner-art .star-big{height:clamp(46px,8vw,70px);fill:var(--sun);stroke:var(--sun-deep);stroke-width:1.4;stroke-linejoin:round}
+.banner-big{font:700 clamp(30px,5.5vw,50px)/1.1 var(--f-play);text-wrap:balance}
+.banner-small{font:600 clamp(18px,3vw,24px)/1.3 var(--f-play);color:var(--good-deep);margin-top:6px;text-wrap:balance}
+
+@keyframes tokin{from{opacity:0;transform:translateY(26px) scale(.4)}to{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.2)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}15%{transform:translateX(-14px) rotate(-3deg)}30%{transform:translateX(12px) rotate(3deg)}45%{transform:translateX(-9px)}60%{transform:translateX(7px)}75%{transform:translateX(-4px)}}
+@keyframes nudge{0%,100%{transform:none}50%{transform:scale(1.08)}}
+@keyframes blink{to{visibility:hidden}}
+@keyframes eyeblink{0%,93%,100%{transform:scaleY(1)}95.5%{transform:scaleY(.1)}}
+@keyframes pillin{from{opacity:0;transform:translateY(8px) scale(.7)}to{opacity:1;transform:none}}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.25)}100%{transform:scale(1)}}
+@keyframes markpop{from{transform:scale(0)}to{transform:scale(1)}}
+@keyframes breathe{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.025)}}
+@keyframes cheer{0%,100%{transform:translateY(0) scale(1,1)}20%{transform:translateY(0) scale(1.06,.9)}50%{transform:translateY(-18px) scale(.97,1.05)}80%{transform:translateY(0) scale(1.05,.93)}}
+@keyframes arrive{from{transform:scale(0)}to{transform:scale(1)}}
+@keyframes idlehop{0%,70%,100%{transform:translateY(0) scale(1,1)}76%{transform:translateY(0) scale(1.06,.9)}86%{transform:translateY(-22%) scale(.96,1.05)}95%{transform:translateY(0) scale(1.05,.92)}}
+@keyframes tentick{from{stroke:var(--ink)}to{stroke:var(--hop2)}}
+@keyframes tennum{from{fill:var(--ink)}to{fill:var(--hop2)}}
+
+@media (max-width:760px){
+  .play{grid-template-columns:minmax(0,1fr)}
+  .pad{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .new-btn{align-self:stretch}
+}
+@media (max-width:640px){
+  .modes{grid-template-columns:minmax(0,1fr)}
+  .line-panel{padding:22px 8px 2px}
+  .mode-pill{display:none}
+  .tribune-wrap{order:5;flex-basis:100%}
+  .bar > .stars{margin-left:auto}
+  #tribune{height:60px}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="star" viewBox="0 0 24 24">
+      <path d="M12 2.2l2.9 6 6.6.8-4.9 4.6 1.3 6.5L12 16.9 6.1 20.1l1.3-6.5L2.5 9l6.6-.8z"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="app">
+  <!-- Startskjerm -->
+  <section id="start" class="start">
+    <h1 class="wordmark">Hoppe<span>dyrene</span></h1>
+    <div class="hero-row" id="heroRow" aria-label="Dyrene du kan samle"></div>
+    <p class="lead" id="heroLead">Få fem stjerner, så kommer et nytt dyr. Velg et spill:</p>
+    <div class="modes">
+      <button class="mode-card" data-mode="ti" id="modeTi">
+        <span class="mode-name">Opp til 10</span>
+        <span class="mode-ex"><span class="a">4</span><span>+</span><span class="b">3</span></span>
+        <svg class="mini" id="miniTi" viewBox="0 0 240 64" aria-hidden="true"></svg>
+        <span class="mode-note">Svaret er aldri mer enn 10.</span>
+      </button>
+      <button class="mode-card" data-mode="over" id="modeOver">
+        <span class="mode-name">Over 10</span>
+        <span class="mode-ex"><span class="a">8</span><span>+</span><span class="b">5</span></span>
+        <svg class="mini" id="miniOver" viewBox="0 0 240 64" aria-hidden="true"></svg>
+        <span class="mode-note">Tieroverganger: dyret hopper forbi 10.</span>
+      </button>
+      <button class="mode-card" data-mode="minus" id="modeMinus">
+        <span class="mode-name">Minus</span>
+        <span class="mode-ex"><span class="a">9</span><span>−</span><span class="b">4</span></span>
+        <svg class="mini" id="miniMinus" viewBox="0 0 240 64" aria-hidden="true"></svg>
+        <span class="mode-note">Dyret hopper bakover. Starttallet blir større jo flere du klarer.</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Spillskjerm -->
+  <section id="game" class="game" hidden>
+    <header class="bar">
+      <button class="back" id="backBtn" type="button">‹ Bytt spill</button>
+      <span class="mode-pill" id="modePill">Opp til 10</span>
+      <div class="tribune-wrap"><svg id="tribune" viewBox="0 -26 104 146" role="img" aria-label="Dyrene som ser på"></svg></div>
+      <div class="stars" id="stars" aria-label="Stjerner">
+        <svg class="star-ico" id="starIcon" viewBox="0 0 24 24" aria-hidden="true"><use href="#star"/></svg><span id="starCount">0</span>
+        <span class="pips" id="pips" aria-hidden="true"></span>
+      </div>
+    </header>
+
+    <div class="line-panel">
+      <svg id="line" viewBox="0 -20 1000 285" role="img" aria-label="Tallinje"></svg>
+    </div>
+
+    <div class="play">
+      <div class="task-col">
+        <div class="task-card" id="card"></div>
+        <div class="feedback" id="feedback" aria-live="polite"></div>
+        <button class="new-btn pulse" id="newBtn" type="button">Ny oppgave</button>
+      </div>
+      <div class="pad off" id="pad" aria-label="Talltastatur">
+        <button class="key" type="button" data-k="1">1</button>
+        <button class="key" type="button" data-k="2">2</button>
+        <button class="key" type="button" data-k="3">3</button>
+        <button class="key" type="button" data-k="4">4</button>
+        <button class="key" type="button" data-k="5">5</button>
+        <button class="key" type="button" data-k="6">6</button>
+        <button class="key" type="button" data-k="7">7</button>
+        <button class="key" type="button" data-k="8">8</button>
+        <button class="key" type="button" data-k="9">9</button>
+        <button class="key del" type="button" data-k="del" aria-label="Slett">⌫</button>
+        <button class="key" type="button" data-k="0">0</button>
+        <button class="key ok" type="button" data-k="ok">OK</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<canvas id="confetti" aria-hidden="true"></canvas>
+<div class="banner" id="banner" aria-live="polite">
+  <div class="banner-art" id="bannerArt"></div>
+  <div class="banner-big" id="bannerBig"></div>
+  <div class="banner-small" id="bannerSmall"></div>
+</div>
+
+<script>
+(function(){
+  const NS = 'http://www.w3.org/2000/svg';
+  const reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = s => document.querySelector(s);
+
+  /* ---------- dyrene (100 × 120-boks, føttene på y = 118, ankerpunkt x = 55, ser mot høyre) ---------- */
+  const ANIMALS = [
+    { name:'Kenguru', def:'Kenguruen', H:1, dur:1, sq:1, lean:5, svg:`
+      <g stroke="#6E3C14" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+        <path fill="#D4843A" d="M36 90 C 24 97, 12 105, 3 114 C 7 117.5, 14 116.5, 20 113 C 29 108, 37 102, 44 97 Z"/>
+        <ellipse fill="#D4843A" cx="55" cy="23" rx="5" ry="12" transform="rotate(-18 55 23)"/>
+        <ellipse fill="#E8A055" cx="48" cy="77" rx="21" ry="27" transform="rotate(15 48 77)"/>
+        <ellipse fill="#E8A055" cx="44" cy="94" rx="17" ry="15"/>
+        <path fill="#E8A055" d="M37 111 Q 37 104.5, 45 104.5 L 80 107.5 Q 87 108.5, 87 113 Q 87 118, 81 118 L 42 118 Q 37 118, 37 111 Z"/>
+        <ellipse fill="#F8DDB0" stroke="none" cx="57" cy="80" rx="9.5" ry="16" transform="rotate(15 57 80)"/>
+        <path fill="none" stroke-width="1.8" d="M50 88 Q 57 94, 64 87"/>
+        <ellipse fill="#E8A055" cx="68" cy="68" rx="3.6" ry="8.5" transform="rotate(-30 68 68)"/>
+        <ellipse fill="#E8A055" cx="58" cy="50" rx="9" ry="8"/>
+        <ellipse fill="#E8A055" cx="63" cy="20" rx="5.5" ry="13" transform="rotate(6 63 20)"/>
+        <ellipse fill="#F4A6A0" stroke="none" cx="63.3" cy="21" rx="2.5" ry="8" transform="rotate(6 63 21)"/>
+        <path fill="#E8A055" d="M51 41 C 50 31, 58 27, 66 28 C 73 29, 77 33, 83 36 C 89 38, 91 43, 87 47 C 84 50, 77 51, 70 50 C 62 51, 52 50, 51 41 Z"/>
+      </g>
+      <ellipse fill="#3A2416" cx="87.5" cy="40.5" rx="3" ry="2.4"/>
+      <g class="eye"><circle fill="#3A2416" cx="68" cy="36" r="3.4"/><circle fill="#fff" cx="69.2" cy="34.8" r="1.2"/></g>
+      <circle fill="#F4A6A0" opacity=".6" cx="73" cy="44" r="3.4"/>
+      <path fill="none" stroke="#3A2416" stroke-width="2" stroke-linecap="round" d="M78.5 46 Q 82.5 50, 87 46"/>`},
+
+    { name:'Frosk', def:'Frosken', H:.62, dur:1.05, sq:1.6, lean:10, svg:`
+      <g stroke="#2F6A22" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+        <path fill="#4FA83A" d="M14 115 Q 14 109.5, 22 109.5 L 50 111.5 Q 56 112.5, 56 115 Q 56 118.5, 50 118.5 L 18 118.5 Q 14 118.5, 14 115 Z"/>
+        <ellipse fill="#5DBB46" cx="36" cy="99" rx="21" ry="14" transform="rotate(-12 36 99)"/>
+        <ellipse fill="#6CC94F" cx="56" cy="90" rx="30" ry="21" transform="rotate(-14 56 90)"/>
+        <ellipse fill="#D6F2AE" stroke="none" cx="67" cy="99" rx="15" ry="10" transform="rotate(-14 67 99)"/>
+        <ellipse fill="#6CC94F" cx="70" cy="76" rx="21" ry="14"/>
+        <circle fill="#6CC94F" cx="60" cy="63" r="9.5"/>
+        <circle fill="#6CC94F" cx="77" cy="62" r="9.5"/>
+        <ellipse fill="#5DBB46" cx="76" cy="106" rx="4.5" ry="9" transform="rotate(-8 76 106)"/>
+        <ellipse fill="#5DBB46" cx="80" cy="115.5" rx="8" ry="3.5"/>
+      </g>
+      <g class="eye"><circle fill="#fff" cx="60" cy="63" r="6.5"/><circle fill="#1F2A1A" cx="62" cy="63.5" r="3.4"/><circle fill="#fff" cx="63" cy="62.3" r="1.1"/></g>
+      <g class="eye"><circle fill="#fff" cx="77" cy="62" r="6.5"/><circle fill="#1F2A1A" cx="79" cy="62.5" r="3.4"/><circle fill="#fff" cx="80" cy="61.3" r="1.1"/></g>
+      <circle fill="#F49AA0" opacity=".6" cx="84" cy="77" r="3.6"/>
+      <path fill="none" stroke="#1F2A1A" stroke-width="2.2" stroke-linecap="round" d="M70 79 Q 80 87.5, 89 77"/>`},
+
+    { name:'Hare', def:'Haren', H:1, dur:.8, sq:1, lean:9, svg:`
+      <g stroke="#6B5240" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+        <ellipse fill="#B8977A" cx="57" cy="28" rx="5.5" ry="19" transform="rotate(-16 57 28)"/>
+        <circle fill="#FFFFFF" cx="22" cy="95" r="8.5"/>
+        <ellipse fill="#C9A98A" cx="50" cy="84" rx="21" ry="24" transform="rotate(20 50 84)"/>
+        <ellipse fill="#C9A98A" cx="38" cy="99" rx="19" ry="16"/>
+        <path fill="#C9A98A" d="M28 113 Q 28 108, 36 108 L 66 110 Q 72 111, 72 114.5 Q 72 118.5, 66 118.5 L 32 118.5 Q 28 118.5, 28 113 Z"/>
+        <ellipse fill="#F3E6D6" stroke="none" cx="60" cy="88" rx="9" ry="14" transform="rotate(20 60 88)"/>
+        <ellipse fill="#C9A98A" cx="67" cy="103" rx="4.5" ry="11"/>
+        <ellipse fill="#C9A98A" cx="71" cy="115" rx="7.5" ry="3.6"/>
+        <ellipse fill="#C9A98A" cx="66" cy="26" rx="6" ry="20" transform="rotate(-3 66 26)"/>
+        <ellipse fill="#F4B0A8" stroke="none" cx="66.2" cy="27" rx="2.8" ry="14" transform="rotate(-3 66 27)"/>
+        <ellipse fill="#C9A98A" cx="70" cy="53" rx="16" ry="14"/>
+        <path fill="none" stroke-width="1.2" d="M86 56.5 L 95 54.5 M86 58.5 L 95 59.5"/>
+      </g>
+      <ellipse fill="#E58A93" cx="85" cy="53.5" rx="2.8" ry="2.1"/>
+      <g class="eye"><circle fill="#3A2A1E" cx="74" cy="49" r="3.4"/><circle fill="#fff" cx="75.2" cy="47.8" r="1.2"/></g>
+      <circle fill="#F4A6A0" opacity=".6" cx="77.5" cy="58" r="3.4"/>
+      <path fill="none" stroke="#3A2A1E" stroke-width="2" stroke-linecap="round" d="M80.5 58 Q 83.5 61.5, 87 57.5"/>`},
+
+    { name:'Ekorn', def:'Ekornet', H:.72, dur:.75, sq:1, lean:8, svg:`
+      <g stroke="#7A3412" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+        <path fill="#C95A24" d="M42 104 C 16 108, 4 82, 10 60 C 15 40, 32 28, 45 35 C 54 40, 50 52, 40 54 C 30 57, 31 72, 40 82 C 47 89, 50 100, 42 104 Z"/>
+        <path fill="none" stroke="#EE9A5E" stroke-width="2.4" d="M22 94 C 14 80, 15 60, 29 46"/>
+        <ellipse fill="#D9682E" cx="50" cy="101" rx="14" ry="12"/>
+        <ellipse fill="#D9682E" cx="58" cy="86" rx="14" ry="19" transform="rotate(15 58 86)"/>
+        <path fill="#D9682E" d="M42 113 Q 42 108.5, 48 108.5 L 69 110 Q 74 110.5, 74 114 Q 74 118.5, 69 118.5 L 46 118.5 Q 42 118.5, 42 113 Z"/>
+        <ellipse fill="#F7E1C2" stroke="none" cx="64" cy="89" rx="7" ry="12" transform="rotate(15 64 89)"/>
+        <ellipse fill="#D9682E" cx="71" cy="80" rx="3.4" ry="7.5" transform="rotate(-35 71 80)"/>
+        <path fill="#D9682E" d="M66 52 L 65.5 38 Q 67.5 34, 70 37.5 L 74 50 Z"/>
+        <path fill="#D9682E" d="M60 61 C 59 52, 66 48, 73 49 C 80 50, 84 55, 87 60 C 89 64, 86 68, 81 69 C 75 70, 66 71, 62 67 C 60 65, 60 63, 60 61 Z"/>
+      </g>
+      <ellipse fill="#3A1E10" cx="86.5" cy="60.5" rx="2.5" ry="2.1"/>
+      <g class="eye"><circle fill="#3A1E10" cx="74" cy="57" r="3.3"/><circle fill="#fff" cx="75.2" cy="55.8" r="1.1"/></g>
+      <circle fill="#F4A6A0" opacity=".55" cx="78" cy="64" r="3.2"/>
+      <path fill="none" stroke="#3A1E10" stroke-width="2" stroke-linecap="round" d="M79 65 Q 82.5 68.5, 86.5 64.5"/>`},
+
+    { name:'Gresshoppe', def:'Gresshoppa', H:1.45, dur:1.05, sq:1.2, lean:0, svg:`
+      <g fill="none" stroke="#3F6B1E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M80 70 C 80 56, 74 46, 62 40"/>
+        <path d="M84 71 C 88 57, 86 47, 78 38"/>
+        <path d="M60 97 L 56 108 L 60 117.5"/>
+        <path d="M68 96 L 70 107 L 75 117.5"/>
+      </g>
+      <g stroke="#3F6B1E" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+        <ellipse fill="#8BC34A" cx="40" cy="93" rx="27" ry="10.5" transform="rotate(-6 40 93)"/>
+        <path fill="none" stroke-width="1.6" d="M28 85 Q 25 94, 28 103 M38 84 Q 35 94, 38 103 M48 83 Q 45 93, 48 102"/>
+        <path fill="#6FA83A" d="M62 84 C 46 80, 26 82, 14 91 C 30 90, 48 91, 62 90 Z"/>
+        <ellipse fill="#9CCF5A" cx="64" cy="88" rx="11" ry="11"/>
+        <ellipse fill="#9CCF5A" cx="79" cy="81" rx="11" ry="12.5"/>
+        <ellipse fill="#7DB842" cx="41" cy="77" rx="20" ry="7" transform="rotate(41 41 77)"/>
+        <path fill="none" stroke-width="3.4" d="M26 64.5 L 18 116"/>
+        <path fill="none" stroke-width="3" d="M12 117.5 L 24 117.5"/>
+        <path fill="none" stroke-width="2.8" d="M66 98 L 64 108 L 68 117.5"/>
+        <path fill="none" stroke-width="2.8" d="M74 95 L 80 105 L 86 117.5"/>
+      </g>
+      <g class="eye"><circle fill="#fff" cx="81" cy="77" r="5.6"/><circle fill="#1F2A1A" cx="83" cy="77.5" r="3"/><circle fill="#fff" cx="84" cy="76.3" r="1"/></g>
+      <circle fill="#F49AA0" opacity=".6" cx="84" cy="86" r="3"/>
+      <path fill="none" stroke="#1F2A1A" stroke-width="2" stroke-linecap="round" d="M77.5 88 Q 82.5 92.5, 88 87.5"/>`}
+  ];
+
+  const startEl = $('#start'), gameEl = $('#game'), lineSvg = $('#line'), card = $('#card'),
+        feedback = $('#feedback'), newBtn = $('#newBtn'), pad = $('#pad'), backBtn = $('#backBtn'),
+        starsEl = $('#stars'), starCount = $('#starCount'), starIcon = $('#starIcon'), pipsEl = $('#pips'),
+        modePill = $('#modePill'), banner = $('#banner'), bannerArt = $('#bannerArt'),
+        bannerBig = $('#bannerBig'), bannerSmall = $('#bannerSmall'), trib = $('#tribune'), heroRow = $('#heroRow');
+
+  const state = { mode:null, max:10, stars:0, task:null, attempts:0, entry:'', phase:'idle', k:0, dir:1,
+                  bag:[], last:null, collected:0, hopper:0, minusSolved:0 };
+
+  /* ---------- hjelpere ---------- */
+  function el(tag, attrs, parent){
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  const wait = ms => new Promise(r => setTimeout(r, reduced ? Math.min(ms, 150) : ms));
+  function tween(dur, step){
+    return new Promise(res => {
+      if (reduced || dur <= 0){ step(1); res(); return; }
+      const t0 = performance.now();
+      const f = now => { const t = Math.min(1, (now - t0) / dur); step(t); if (t < 1) requestAnimationFrame(f); else res(); };
+      requestAnimationFrame(f);
+    });
+  }
+  function shuffle(a){ for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+  const backOut = t => { const c = 1.9; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
+  function animalSvg(i, cls){
+    return `<svg viewBox="0 -6 100 126" aria-hidden="true"${cls ? ` class="${cls}"` : ''}><g style="--bd:-${(i*1.3+.4).toFixed(1)}s">${ANIMALS[i].svg}</g></svg>`;
+  }
+  function silhouetteSvg(i){
+    return `<svg viewBox="0 -6 100 126" aria-hidden="true"><g class="sil">${ANIMALS[i].svg}</g><text class="q" x="52" y="98">?</text></svg>`;
+  }
+
+  /* ---------- oppgaver ---------- */
+  // Største tall alltid først, ingen 0-ledd, like tall er med.
+  function pool(mode){
+    const out = [];
+    for (let a = 1; a <= 9; a++) for (let b = 1; b <= a; b++){
+      if (mode === 'ti' && a + b <= 10) out.push([a, b]);   // 25 stykker
+      if (mode === 'over' && a + b > 10) out.push([a, b]);  // 20 stykker
+    }
+    return out;
+  }
+  // Minus: starttallet klatrer oppover tallinja jo flere minusstykker eleven klarer.
+  const minusTop = () => Math.min(20, 5 + Math.floor(state.minusSolved / 2));
+  function drawMinus(){
+    const top = minusTop(), low = Math.max(2, top - 4);
+    let a, b, tries = 0;
+    do {
+      a = low + Math.floor(Math.random() * (top - low + 1));
+      b = 1 + Math.floor(Math.random() * Math.min(a, 10));
+      tries++;
+    } while (tries < 30 && state.last && a === state.last[0] && b === state.last[1]);
+    state.last = [a, b];
+    return [a, b];
+  }
+  function drawTask(){
+    if (state.mode === 'minus') return drawMinus();
+    if (!state.bag.length){
+      const p = shuffle(pool(state.mode));
+      if (state.last && p.length > 1 && p[0][0] === state.last[0] && p[0][1] === state.last[1]) [p[0], p[1]] = [p[1], p[0]];
+      state.bag = p;
+    }
+    const t = state.bag.shift();
+    state.last = t;
+    return t;
+  }
+
+  /* ---------- startskjerm ---------- */
+  function drawMini(svg, max, a, b, sign = 1){
+    const L = 14, R = 210, Y = 40, u = (R - L) / max;
+    el('line', {x1:L-6, y1:Y, x2:R+16, y2:Y, class:'mini-axis'}, svg);
+    el('path', {d:`M${R+11} ${Y-5} L${R+18} ${Y} L${R+11} ${Y+5}`, class:'mini-arrow'}, svg);
+    for (let n = 0; n <= max; n++){
+      const ten = n === 10 && max > 10, x = L + n*u;
+      el('line', {x1:x, y1:Y-(ten?7:4), x2:x, y2:Y+(ten?7:4), class:'mini-tick'+(ten?' ten':'')}, svg);
+      if (n === 0 || n === 10 || n === max) { const t = el('text', {x, y:Y+20, class:'mini-lbl'}, svg); t.textContent = n; }
+    }
+    const h = max > 10 ? 9 : 13;
+    for (let i = 0; i < b; i++){
+      const f = a + i*sign, t2 = f + sign, x1 = L + f*u + 1.5*sign, x2 = L + t2*u - 1.5*sign;
+      el('path', {d:`M${x1} ${Y-3} Q ${(x1+x2)/2} ${Y-3-2*h} ${x2} ${Y-3}`, class:'mini-arc'+(sign > 0 && t2 > 10 ? ' after' : '')}, svg);
+    }
+    el('circle', {cx:L + a*u, cy:Y, r:4.2, class:'dot-start'}, svg);
+    el('circle', {cx:L + (a+b*sign)*u, cy:Y, r:4.2, class:'dot-end'}, svg);
+  }
+  drawMini($('#miniTi'), 10, 4, 3);
+  drawMini($('#miniOver'), 20, 8, 5);
+  drawMini($('#miniMinus'), 20, 9, 4, -1);
+
+  function renderHero(){
+    let html = '';
+    ANIMALS.forEach((a, i) => {
+      const unlocked = state.collected >= 5 || i <= state.collected;
+      html += unlocked ? animalSvg(i, i === state.hopper ? 'now' : '') : silhouetteSvg(i);
+    });
+    heroRow.innerHTML = html;
+    const lead = $('#heroLead');
+    lead.textContent = state.collected >= 5 ? 'Du har samlet alle dyrene! Velg et spill:'
+      : state.stars > 0 ? `Du har ${state.stars} ${state.stars === 1 ? 'stjerne' : 'stjerner'}. Velg et spill:`
+      : 'Få fem stjerner, så kommer et nytt dyr. Velg et spill:';
+  }
+
+  /* ---------- tribunen og stjernene ---------- */
+  function renderTribune(arrive){
+    const items = [];
+    if (state.collected < 5){
+      for (let i = 0; i < state.collected; i++) items.push({i, kind:'fan'});
+      if (state.collected + 1 < 5) items.push({i:state.collected + 1, kind:'sil'});
+    } else {
+      ANIMALS.forEach((a, i) => { if (i !== state.hopper) items.push({i, kind:'pick'}); });
+    }
+    const SW = 104;
+    trib.setAttribute('viewBox', `0 -26 ${Math.max(1, items.length) * SW} 146`);
+    trib.replaceChildren();
+    items.forEach((it, k) => {
+      const outer = el('g', {transform:`translate(${k*SW + SW/2} 0)`}, trib);
+      if (it.kind === 'pick'){
+        outer.setAttribute('data-pick', it.i);
+        outer.setAttribute('role', 'button');
+        outer.setAttribute('aria-label', `Bytt til ${ANIMALS[it.i].name.toLowerCase()}`);
+        el('rect', {x:-50, y:-20, width:100, height:140, fill:'transparent'}, outer);
+      }
+      const fan = el('g', {class:'fan' + (it.kind === 'sil' ? ' sil' : '') + (it.i === arrive ? ' arrive' : ''),
+                           style:`--bd:-${(k*1.7 + .6).toFixed(1)}s;--cd:${k*90}ms`}, outer);
+      const flip = el('g', {transform:'scale(-1 1) translate(-55 0)'}, fan);
+      flip.innerHTML = ANIMALS[it.i].svg;
+      if (it.kind === 'sil'){ const q = el('text', {x:0, y:98, class:'q'}, outer); q.textContent = '?'; }
+    });
+  }
+  function cheer(){
+    trib.querySelectorAll('.fan:not(.sil)').forEach(f => { f.classList.remove('cheer', 'arrive'); void f.getBoundingClientRect(); f.classList.add('cheer'); });
+  }
+  function renderPips(n){
+    pipsEl.innerHTML = Array.from({length:5}, (_, i) => `<svg viewBox="0 0 24 24" class="${i < n ? 'on' : ''}"><use href="#star"/></svg>`).join('');
+  }
+  function setPip(n){
+    const s = pipsEl.children[n - 1];
+    if (s) s.classList.add('on');
+  }
+
+  /* ---------- tallinja ---------- */
+  const LY = 190, X0 = 55, X1 = 925;
+  let U = 87, KS = 1, labels = [];
+  const g = {};
+  const xOf = n => X0 + n * U;
+
+  function buildLine(){
+    lineSvg.replaceChildren();
+    lineSvg.classList.remove('hint10');
+    const max = state.max;
+    U = (X1 - X0) / max;
+    KS = max > 10 ? 1.0 : 1.2;
+    const fs = max > 10 ? 28 : 36;
+    g.base = el('g', {}, lineSvg);
+    g.marks = el('g', {}, lineSvg);
+    g.labels = el('g', {}, lineSvg);
+    g.arcs = el('g', {}, lineSvg);
+    g.nums = el('g', {}, lineSvg);
+    el('line', {x1:X0-28, y1:LY, x2:X1+44, y2:LY, class:'nl-axis'}, g.base);
+    el('path', {d:`M${X1+38} ${LY-13} L${X1+56} ${LY} L${X1+38} ${LY+13}`, class:'nl-arrow'}, g.base);
+    labels = [];
+    for (let n = 0; n <= max; n++){
+      const x = xOf(n), ten = max > 10 && n === 10;
+      el('line', {x1:x, y1:LY-(ten?24:13), x2:x, y2:LY+(ten?24:13), class:'nl-tick'+(ten?' ten':'')}, g.base);
+      const t = el('text', {x, y:LY+56, 'font-size':ten ? fs+6 : fs, class:'nl-num'+(ten?' ten':'')}, g.labels);
+      t.textContent = n;
+      labels[n] = t;
+    }
+    g.roo = el('g', {}, lineSvg);
+    buildHopper();
+    setRoo(xOf(state.k), 0, 1, 1, 0);
+  }
+  function buildHopper(){
+    g.roo.replaceChildren();
+    g.rooInner = el('g', {}, g.roo);
+    const bob = el('g', {class:'roo-bob'}, g.rooInner);
+    const a = el('g', {transform:`translate(${-55*KS} ${-118*KS}) scale(${KS})`, style:'--bd:-2.1s'}, bob);
+    a.innerHTML = ANIMALS[state.hopper].svg;
+  }
+  function setRoo(x, y, sx, sy, rot){
+    g.roo.setAttribute('transform', `translate(${x} ${LY - 3 + y})`);
+    g.rooInner.setAttribute('transform', `rotate(${rot} 0 ${-54*KS}) scale(${state.dir*sx} ${sy})`);
+  }
+  // Ett hopp: sats, bue, landing. Hvert dyr har sin egen hoppestil.
+  function hop(from, to, H, dur, onAir){
+    const an = ANIMALS[state.hopper];
+    H *= an.H; dur *= an.dur;
+    const sq = an.sq, lean = an.lean;
+    const xa = xOf(from), xb = xOf(to);
+    return tween(dur, t => {
+      let x = xa, y = 0, sx = 1, sy = 1, rot = 0;
+      if (t < .16){ const s = Math.sin((t/.16) * Math.PI/2); sy = 1 - .16*sq*s; sx = 1 + .08*sq*s; }
+      else if (t < .84){
+        const p = (t - .16) / .68, e = Math.abs(1 - 2*p);
+        x = xa + (xb - xa) * p; y = -H * 4 * p * (1 - p); sy = 1 + .1*sq*e; sx = 1 - .05*sq*e;
+        if (from !== to) rot = lean * (2*p - 1) * state.dir;
+        if (onAir) onAir(p);
+      } else {
+        const q = (t - .84) / .16, s = Math.sin(q * Math.PI);
+        x = xb; sy = 1 - .14*sq*s; sx = 1 + .07*sq*s;
+        if (onAir) onAir(1);
+      }
+      setRoo(x, y, sx, sy, rot);
+    });
+  }
+  async function turnTo(n, face){
+    if (state.dir === face) return;
+    const d0 = state.dir;
+    await tween(220, t => { state.dir = 1; setRoo(xOf(n), 0, d0 * (1 - 2*t), 1, 0); });
+    state.dir = face; setRoo(xOf(n), 0, 1, 1, 0);
+  }
+  async function leapTo(n, face){
+    const from = state.k;
+    if (n === from){ await turnTo(n, face); await hop(from, from, 40, 420); return; }
+    state.dir = n < from ? -1 : 1; setRoo(xOf(from), 0, 1, 1, 0);
+    const dist = Math.abs(n - from) * U;
+    const H = Math.min(110 / ANIMALS[state.hopper].H, Math.min(95, 45 + dist*0.09));
+    await hop(from, n, H, Math.min(900, 480 + Math.abs(n - from)*28));
+    state.k = n;
+    await turnTo(n, face);
+  }
+  function addArc(from, to, i){
+    const big = state.max > 10;
+    const s = to > from ? 1 : -1;
+    const xa = xOf(from) + 4*s, xb = xOf(to) - 4*s, y = LY - 9, h = big ? 30 : 44;
+    const after = state.mode === 'over' && to > 10;
+    const p = el('path', {d:`M${xa} ${y} Q ${(xa+xb)/2} ${y - 2*h} ${xb} ${y}`, class:'arc' + (after ? ' after' : '')}, g.arcs);
+    const len = p.getTotalLength();
+    p.style.strokeDasharray = len; p.style.strokeDashoffset = len;
+    const num = el('text', {x:(xa+xb)/2, y:y - h - 10, 'font-size':big ? 19 : 24, class:'hopnum' + (after ? ' after' : '')}, g.nums);
+    num.textContent = i;
+    return q => { p.style.strokeDashoffset = len * (1 - q); if (q > .45) num.classList.add('show'); };
+  }
+  function mark(n, type){
+    const r = state.max > 10 ? 19 : 25;
+    const size = +labels[n].getAttribute('font-size');
+    el('circle', {cx:xOf(n), cy:LY + 56 - size*.36, r, class:'mark ' + type}, g.marks);
+    labels[n].classList.add('on-' + type);
+  }
+  function clearLine(){
+    g.arcs.replaceChildren(); g.nums.replaceChildren(); g.marks.replaceChildren();
+    labels.forEach(t => t.classList.remove('on-start', 'on-end'));
+    lineSvg.classList.remove('hint10');
+  }
+
+  /* ---------- oppgavekortet ---------- */
+  let answerEl = null, digitsEl = null, caretEl = null;
+  function setIdleCard(){
+    const extra = state.collected >= 5 ? '<small>Trykk på et dyr oppe til høyre for å bytte hopper.</small>' : '';
+    card.innerHTML = `<p class="idle-msg">Trykk på <b>Ny oppgave</b>${extra}</p>`;
+    answerEl = null;
+  }
+  function showTask(a, b){
+    card.innerHTML =
+      `<div class="expr" aria-label="${a} ${state.mode === 'minus' ? 'minus' : 'pluss'} ${b}">` +
+      `<span class="tok a" style="--d:0ms">${a}</span>` +
+      `<span class="tok op" style="--d:110ms">${state.mode === 'minus' ? '−' : '+'}</span>` +
+      `<span class="tok b" style="--d:220ms">${b}</span>` +
+      `<span class="tok op" style="--d:330ms">=</span>` +
+      `<span class="tok" style="--d:440ms"><span class="answer" id="answer"><span class="digits"></span><span class="caret"></span></span></span>` +
+      `</div>`;
+    answerEl = $('#answer'); digitsEl = answerEl.querySelector('.digits'); caretEl = answerEl.querySelector('.caret');
+    renderEntry();
+  }
+  function renderEntry(){
+    if (!answerEl) return;
+    digitsEl.textContent = state.entry;
+    answerEl.classList.toggle('has', state.entry.length > 0);
+    caretEl.hidden = !(state.phase === 'answer' && state.entry.length < 2);
+  }
+  function setFeedback(type, text, hint){
+    feedback.replaceChildren();
+    if (!type) return;
+    const p = document.createElement('span');
+    p.className = 'pill ' + type; p.textContent = text;
+    feedback.appendChild(p);
+    if (hint){ const h = document.createElement('p'); h.className = 'hint'; h.textContent = hint; feedback.appendChild(h); }
+  }
+  function setPad(on){
+    pad.classList.toggle('off', !on);
+    pad.querySelectorAll('.key').forEach(k => k.disabled = !on);
+  }
+  function setBusy(busy){ backBtn.disabled = busy; }
+
+  /* ---------- spillflyt ---------- */
+  async function newTask(){
+    if (state.phase !== 'idle') return;
+    state.phase = 'busy'; setBusy(true);
+    newBtn.disabled = true; newBtn.classList.remove('pulse');
+    const [a, b] = drawTask();
+    state.task = {a, b}; state.attempts = 0; state.entry = '';
+    clearLine(); setFeedback('');
+    showTask(a, b);
+    await leapTo(a, state.mode === 'minus' ? -1 : 1);
+    mark(a, 'start');
+    state.phase = 'answer'; setBusy(false);
+    setPad(true); renderEntry();
+  }
+
+  function typeDigit(d){
+    if (state.phase !== 'answer' || state.entry.length >= 2) return;
+    if (state.entry === '0') state.entry = '';
+    state.entry += d; renderEntry();
+  }
+  function del(){
+    if (state.phase !== 'answer') return;
+    state.entry = state.entry.slice(0, -1); renderEntry();
+  }
+  const result = () => state.mode === 'minus' ? state.task.a - state.task.b : state.task.a + state.task.b;
+  function check(){
+    if (state.phase !== 'answer') return;
+    if (!state.entry){
+      answerEl.classList.remove('nudge'); void answerEl.offsetWidth; answerEl.classList.add('nudge');
+      return;
+    }
+    if (parseInt(state.entry, 10) === result()) correct(); else wrong();
+  }
+
+  async function wrong(){
+    state.phase = 'busy'; state.attempts++;
+    renderEntry();
+    answerEl.classList.remove('wrong', 'nudge'); void answerEl.offsetWidth; answerEl.classList.add('wrong');
+    const {a, b} = state.task;
+    let hint = '';
+    if (state.attempts >= 2){
+      if (state.mode === 'minus'){
+        hint = `Finn ${a} på tallinja di. Hopp ${b} ${b === 1 ? 'gang' : 'ganger'} tilbake.`;
+      } else if (state.mode === 'over'){
+        hint = `Fra ${a} er det ${10 - a} hopp til 10. Du skal hoppe ${b} ganger i alt. Hvor mange hopp er igjen etter 10?`;
+        lineSvg.classList.add('hint10');
+      } else {
+        hint = `Finn ${a} på tallinja di. Hopp ${b} ${b === 1 ? 'gang' : 'ganger'} fram.`;
+      }
+    }
+    setFeedback('try', 'Prøv igjen!', hint);
+    await wait(750);
+    answerEl.classList.add('fade');
+    await wait(320);
+    state.entry = '';
+    answerEl.classList.remove('wrong', 'fade');
+    state.phase = 'answer';
+    renderEntry();
+  }
+
+  async function correct(){
+    state.phase = 'busy'; setBusy(true); setPad(false);
+    renderEntry();
+    const {a, b} = state.task;
+    answerEl.classList.remove('nudge', 'wrong');
+    answerEl.classList.add('right');
+    setFeedback('good', 'Riktig!');
+    lineSvg.classList.remove('hint10');
+    await wait(300);
+    const sgn = state.mode === 'minus' ? -1 : 1;
+    await turnTo(a, sgn);
+    const per = Math.max(270, Math.min(430, 2600 / b));
+    const H = state.max > 10 ? 52 : 64;
+    for (let i = 1; i <= b; i++){
+      const from = a + (i - 1)*sgn, to = a + i*sgn;
+      const drawArc = addArc(from, to, i);
+      await hop(from, to, H, per, drawArc);
+      state.k = to;
+    }
+    mark(a + b*sgn, 'end');
+    if (state.mode === 'minus'){ state.minusSolved++; modePill.textContent = minusLabel(); }
+    cheer();
+    await wait(280);
+    await flyStar();
+    state.stars++;
+    starCount.textContent = state.stars;
+    starsEl.classList.remove('bump'); void starsEl.offsetWidth; starsEl.classList.add('bump');
+    setPip(state.stars % 5 === 0 ? 5 : state.stars % 5);
+
+    if (state.stars % 5 === 0){
+      const level = state.stars / 5;
+      if (state.collected < 5 && level === state.collected + 1){
+        if (level < 5) await newFriend(level); else await finale();
+      } else {
+        await celebrate();
+      }
+      renderPips(0);
+    }
+    await wait(250);
+    await exitTask();
+    setIdleCard(); setFeedback('');
+    state.phase = 'idle'; setBusy(false);
+    newBtn.disabled = false; newBtn.classList.add('pulse');
+  }
+
+  function flyStar(){
+    const s = document.createElement('div');
+    s.className = 'flystar';
+    s.innerHTML = '<svg viewBox="0 0 24 24"><use href="#star"/></svg>';
+    document.body.appendChild(s);
+    const r1 = answerEl.getBoundingClientRect(), r2 = starIcon.getBoundingClientRect();
+    const x1 = r1.left + r1.width/2 - 24, y1 = r1.top + r1.height/2 - 24;
+    const x2 = r2.left + r2.width/2 - 24, y2 = r2.top + r2.height/2 - 24;
+    const mx = (x1 + x2)/2 - 40, my = Math.max(8, (y1 + y2)/2 - 70);
+    const anim = s.animate([
+      {transform:`translate(${x1}px,${y1}px) scale(.3) rotate(0deg)`, opacity:0},
+      {transform:`translate(${x1}px,${y1 - 40}px) scale(1.4) rotate(50deg)`, opacity:1, offset:.28},
+      {transform:`translate(${mx}px,${my}px) scale(1.2) rotate(150deg)`, opacity:1, offset:.62},
+      {transform:`translate(${x2}px,${y2}px) scale(.75) rotate(216deg)`, opacity:1}
+    ], {duration: reduced ? 1 : 950, easing:'ease-in-out'});
+    return anim.finished.catch(() => {}).then(() => s.remove());
+  }
+
+  async function exitTask(){
+    const toks = [...card.querySelectorAll('.tok')];
+    if (reduced || !toks.length) return;
+    const anims = toks.map((t, i) => t.animate([
+      {transform:'none', opacity:1},
+      {transform:'translateY(-14px) scale(1.15)', opacity:1, offset:.35},
+      {transform:'translateY(-60px) scale(.5) rotate(12deg)', opacity:0}
+    ], {duration:420, delay:i*70, easing:'cubic-bezier(.5,0,.75,0)', fill:'forwards'}));
+    await Promise.all(anims.map(a => a.finished.catch(() => {})));
+  }
+
+  function showBanner(art, big, small, rowClass){
+    bannerArt.className = 'banner-art' + (rowClass ? ' row' : '');
+    bannerArt.innerHTML = art; bannerBig.textContent = big; bannerSmall.textContent = small;
+    banner.classList.add('show');
+  }
+  function hideBanner(){ banner.classList.remove('show'); }
+
+  async function flipJump(){
+    const x = xOf(state.k);
+    await tween(950, t => {
+      const e = t < .5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2)/2;
+      setRoo(x, -90 * 4 * t * (1 - t), 1, 1, 360 * e);
+    });
+    setRoo(x, 0, 1, 1, 0);
+  }
+
+  // Vanlig feiring (etter at alle dyrene er samlet)
+  async function celebrate(){
+    showBanner('<svg class="star-big" viewBox="0 0 24 24"><use href="#star"/></svg>', `${state.stars} stjerner!`, 'Kjempebra!');
+    confetti(); cheer();
+    await flipJump();
+    await wait(1100);
+    hideBanner(); await wait(250);
+  }
+
+  // Nytt dyr: det gamle setter seg på tribunen, det nye hopper inn på tallinja.
+  async function newFriend(i){
+    const prev = state.hopper;
+    showBanner(animalSvg(i), `Ny venn: ${ANIMALS[i].name}!`, `${ANIMALS[prev].def} setter seg og ser på.`);
+    confetti();
+    const x = xOf(state.k);
+    await tween(420, t => setRoo(x, -50 * t, 1 - t, 1 - t, 0));
+    state.collected = i; state.hopper = i; state.dir = 1;
+    buildHopper();
+    setRoo(x, 0, 0, 0, 0);
+    renderTribune(prev);
+    await tween(560, t => { const s = Math.max(0, backOut(t)); setRoo(x, 0, s, s, 0); });
+    setRoo(x, 0, 1, 1, 0);
+    await wait(500);
+    cheer();
+    await wait(1300);
+    hideBanner(); await wait(250);
+  }
+
+  // Alle fem dyrene er samlet.
+  async function finale(){
+    state.collected = 5;
+    const row = ANIMALS.map((a, i) => animalSvg(i)).join('');
+    showBanner(row, 'Du har samlet alle dyrene!', 'Trykk på et dyr oppe til høyre for å bytte hopper.', true);
+    confetti();
+    renderTribune(-1);
+    cheer();
+    await flipJump();
+    cheer();
+    await wait(2200);
+    hideBanner(); await wait(250);
+  }
+
+  async function swapHopper(i){
+    if (state.phase === 'busy' || state.collected < 5 || i === state.hopper) return;
+    const prevPhase = state.phase;
+    state.phase = 'busy'; setBusy(true);
+    const wasPad = !pad.classList.contains('off');
+    setPad(false);
+    const x = xOf(state.k);
+    await tween(300, t => setRoo(x, -30 * t, 1 - t, 1 - t, 0));
+    state.hopper = i; state.dir = 1;
+    buildHopper(); setRoo(x, 0, 0, 0, 0);
+    renderTribune(-1);
+    await tween(480, t => { const s = Math.max(0, backOut(t)); setRoo(x, 0, s, s, 0); });
+    setRoo(x, 0, 1, 1, 0);
+    state.phase = prevPhase; setBusy(false);
+    if (wasPad) setPad(true);
+    renderEntry();
+  }
+
+  function confetti(){
+    if (reduced) return;
+    const c = $('#confetti'), ctx = c.getContext('2d'), dpr = window.devicePixelRatio || 1;
+    const W = innerWidth, H = innerHeight;
+    c.width = W * dpr; c.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const cols = ['#FFC83A', '#2F7FE0', '#E0457B', '#22A15E', '#EF8418'];
+    const P = Array.from({length:90}, (_, i) => ({
+      x: W/2 + (Math.random() - .5) * W * .3, y: H * .3,
+      vx: (Math.random() - .5) * 15, vy: -Math.random() * 12 - 5,
+      r: Math.random() * Math.PI, vr: (Math.random() - .5) * .3,
+      w: 8 + Math.random() * 8, h: 5 + Math.random() * 5, c: cols[i % cols.length]
+    }));
+    const t0 = performance.now(), D = 2600;
+    const f = now => {
+      const t = now - t0;
+      ctx.clearRect(0, 0, W, H);
+      for (const p of P){
+        p.vy += .34; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r);
+        ctx.globalAlpha = Math.max(0, 1 - t / D);
+        ctx.fillStyle = p.c; ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+        ctx.restore();
+      }
+      if (t < D) requestAnimationFrame(f); else ctx.clearRect(0, 0, W, H);
+    };
+    requestAnimationFrame(f);
+  }
+
+  /* ---------- skjermbytte ---------- */
+  const minusLabel = () => `Minus · starttall opp til ${minusTop()}`;
+  function startMode(m){
+    state.mode = m; state.max = m === 'ti' ? 10 : 20;
+    state.bag = []; state.last = null; state.k = 0; state.dir = 1;
+    state.phase = 'idle'; state.task = null; state.entry = '';
+    modePill.textContent = m === 'over' ? 'Over 10' : m === 'minus' ? minusLabel() : 'Opp til 10';
+    startEl.hidden = true; gameEl.hidden = false;
+    buildLine(); renderTribune(-1); renderPips(state.stars % 5);
+    setIdleCard(); setFeedback(''); setPad(false); setBusy(false);
+    newBtn.disabled = false; newBtn.classList.add('pulse');
+    window.scrollTo(0, 0);
+  }
+  function showStart(){
+    if (state.phase === 'busy') return;
+    state.phase = 'idle';
+    renderHero();
+    gameEl.hidden = true; startEl.hidden = false;
+    window.scrollTo(0, 0);
+  }
+
+  /* ---------- hendelser ---------- */
+  document.querySelectorAll('.mode-card').forEach(b => b.addEventListener('click', () => startMode(b.dataset.mode)));
+  backBtn.addEventListener('click', showStart);
+  newBtn.addEventListener('click', newTask);
+  trib.addEventListener('click', e => {
+    const p = e.target.closest('[data-pick]');
+    if (p) swapHopper(+p.getAttribute('data-pick'));
+  });
+  pad.addEventListener('click', e => {
+    const k = e.target.closest('.key');
+    if (!k || k.disabled) return;
+    const v = k.dataset.k;
+    if (v === 'del') del(); else if (v === 'ok') check(); else typeDigit(v);
+  });
+  document.addEventListener('keydown', e => {
+    if (e.ctrlKey || e.metaKey || e.altKey || gameEl.hidden) return;
+    if (/^[0-9]$/.test(e.key)){ e.preventDefault(); typeDigit(e.key); return; }
+    if (e.key === 'Backspace'){ e.preventDefault(); del(); return; }
+    if (e.key === 'Enter'){
+      const ae = document.activeElement;
+      if (ae && ae.tagName === 'BUTTON' && !pad.contains(ae) && ae !== newBtn) return;
+      e.preventDefault();
+      if (state.phase === 'answer') check(); else if (state.phase === 'idle') newTask();
+    }
+  });
+
+  renderHero();
+})();
+</script>
+
+</body></html>
