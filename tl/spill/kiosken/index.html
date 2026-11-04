@@ -1,0 +1,647 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Kiosken</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Grandstander:wght@700;800&display=swap">
+<style>
+/* Layout: one-screen kiosk. Header (modes, level) → stall with awning, item and price tag on a wooden counter → wallet dock at the bottom. */
+:root {
+  color-scheme: light;
+  --paper: #EEF3EC;
+  --stall: #FFFBF2;
+  --ink: #22302A;
+  --muted: #5B6B62;
+  --line: #D9DFD5;
+  --awning: #D7432F;
+  --awning-2: #FFE7C2;
+  --wood: #C98B4F;
+  --wood-dark: #9A6232;
+  --tag: #FFD84D;
+  --good: #2C9A57;
+  --good-soft: #DDF3E5;
+  --retry: #DB7A16;
+  --retry-soft: #FFEBD3;
+  --no: #C8442E;
+  --white: #FFFFFF;
+  --f-display: "Grandstander", "Comic Sans MS", "Trebuchet MS", sans-serif;
+  --f-body: "Andika", "Verdana", "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { background: var(--paper); color: var(--ink); font-family: var(--f-body); font-size: 17px; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+
+.app {
+  min-height: 100%;
+  max-width: 1120px; margin: 0 auto;
+  display: grid; grid-template-rows: auto minmax(380px, 1fr) auto; gap: 12px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 12px;
+}
+
+/* ---------- header ---------- */
+header { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.brand {
+  font-family: var(--f-display); font-weight: 800; font-size: 28px; letter-spacing: .01em;
+  background: var(--awning); color: var(--white); padding: 4px 16px 6px; border-radius: 10px;
+  transform: rotate(-2deg); box-shadow: 0 3px 0 var(--wood-dark);
+}
+.modes { display: flex; flex-wrap: wrap; gap: 4px; background: var(--white); padding: 4px; border-radius: 14px; border: 2px solid var(--line); }
+.modes button {
+  border: 0; background: transparent; padding: 8px 14px; border-radius: 10px; font-weight: 700; color: var(--muted);
+}
+.modes button[aria-pressed="true"] { background: var(--ink); color: var(--white); }
+.spacer { flex: 1; }
+.level { display: flex; align-items: center; gap: 8px; }
+.level-label { font-weight: 700; color: var(--muted); font-size: 15px; }
+.level-chips { display: flex; gap: 4px; }
+.level-chips button {
+  width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--line); background: var(--white);
+  font-family: var(--f-display); font-weight: 800; font-size: 18px;
+}
+.level-chips button[aria-pressed="true"] { background: var(--tag); border-color: var(--wood-dark); }
+.dots { display: flex; gap: 4px; margin-left: 4px; }
+.dots i { width: 12px; height: 12px; border-radius: 50%; background: var(--line); display: block; transition: background .3s, transform .3s; }
+.dots i.on { background: var(--good); transform: scale(1.15); }
+.stars { display: flex; align-items: center; gap: 4px; font-family: var(--f-display); font-weight: 800; font-size: 22px; font-variant-numeric: tabular-nums; }
+.stars svg { width: 28px; height: 28px; }
+.icon-btn { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--line); background: var(--white); display: grid; place-items: center; }
+.icon-btn svg { width: 22px; height: 22px; }
+
+/* ---------- stall ---------- */
+.stall {
+  position: relative; background: var(--stall); border-radius: 22px; overflow: hidden;
+  border: 3px solid var(--ink);
+  display: grid; grid-template-rows: auto auto 1fr auto;
+}
+.awning {
+  height: 46px; position: relative; z-index: 2;
+  background: repeating-linear-gradient(90deg, var(--awning) 0 48px, var(--awning-2) 48px 96px);
+  border-bottom: 0;
+}
+.awning::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 16px;
+  background:
+    radial-gradient(circle at 24px 0, var(--awning) 15px, transparent 16px) 0 0 / 96px 16px repeat-x,
+    radial-gradient(circle at 72px 0, var(--awning-2) 15px, transparent 16px) 0 0 / 96px 16px repeat-x;
+}
+.topline {
+  display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 10px 16px;
+  padding: 26px 20px 0;
+}
+.prompt {
+  margin: 0; font-size: clamp(19px, 2.4vw, 24px); font-weight: 700; line-height: 1.3; max-width: 34ch;
+  text-wrap: balance; min-width: 0;
+}
+.basket {
+  display: flex; align-items: center; gap: 8px; background: var(--white); border: 2px solid var(--line);
+  border-radius: 999px; padding: 4px 12px 4px 6px; min-height: 44px;
+}
+.basket svg.basket-icon { width: 32px; height: 32px; flex: none; }
+.basket-items { display: flex; gap: 2px; }
+.basket-items svg { width: 26px; height: 26px; }
+.basket-items .pop { animation: pop .5s ease-out; }
+.basket b { font-family: var(--f-display); font-size: 18px; font-variant-numeric: tabular-nums; }
+
+.showcase {
+  display: flex; align-items: center; justify-content: center; gap: clamp(8px, 3vw, 36px);
+  padding: 8px 16px; min-height: 0;
+}
+.item { width: clamp(130px, 24vh, 230px); aspect-ratio: 1; max-width: 100%; filter: drop-shadow(0 8px 0 rgba(34,48,42,.10)); }
+.item svg { width: 100%; height: 100%; display: block; }
+.item.enter { animation: drop .55s cubic-bezier(.3,1.5,.5,1); }
+.item.sold { animation: sold .6s ease-in forwards; }
+.item.shake { animation: shake .45s; }
+
+.tagwrap { position: relative; padding-top: 34px; transform-origin: 50% 0; animation: swing 4s ease-in-out infinite; }
+.tagwrap::before { content: ""; position: absolute; top: 0; left: 50%; width: 2px; height: 40px; background: var(--wood-dark); }
+.tag {
+  position: relative; background: var(--tag); color: var(--ink);
+  font-family: var(--f-display); font-weight: 800; font-size: clamp(34px, 6vw, 56px); line-height: 1;
+  padding: 26px 22px 16px; border-radius: 14px 14px 18px 18px;
+  box-shadow: 0 4px 0 var(--wood-dark); white-space: nowrap; font-variant-numeric: tabular-nums;
+}
+.tag::before { content: ""; position: absolute; top: 8px; left: 50%; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: var(--stall); box-shadow: inset 0 0 0 2px var(--wood-dark); }
+.tag small { font-size: .5em; margin-left: 4px; }
+.tagwrap[hidden] { display: none !important; }
+
+.counter {
+  background: linear-gradient(var(--wood) 0 14px, var(--wood-dark) 14px 18px, var(--wood) 18px);
+  padding: 22px 16px 16px; border-top: 3px solid var(--ink);
+}
+.tray {
+  position: relative; background: var(--white); border-radius: 16px; border: 3px dashed var(--wood-dark);
+  min-height: 98px; padding: 26px 12px 10px;
+}
+.tray.solid { border-style: solid; }
+.tray-label { position: absolute; top: 5px; left: 14px; font-size: 14px; font-weight: 700; color: var(--muted); }
+.tray-sum { position: absolute; top: 5px; right: 14px; font-size: 14px; font-weight: 700; color: var(--good); font-variant-numeric: tabular-nums; }
+.tray-coins { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-height: 60px; }
+.tray-coins .empty { color: var(--muted); font-size: 15px; }
+.coin { display: inline-grid; place-items: center; border: 0; background: none; padding: 0; border-radius: 50%; line-height: 0; }
+.coin svg { display: block; filter: drop-shadow(0 3px 0 rgba(34,48,42,.22)); }
+.tray-coins .coin { animation: pop .3s ease-out; }
+.tray-coins button.coin:hover svg { transform: translateY(-3px); }
+
+.feedback {
+  position: absolute; left: 50%; top: 92px; transform: translateX(-50%); z-index: 5;
+  max-width: min(92%, 520px); width: max-content;
+  padding: 12px 20px; border-radius: 16px; font-weight: 700; font-size: 19px; line-height: 1.35; text-align: center;
+  border: 3px solid currentColor; animation: pop .35s ease-out;
+}
+.feedback.good { background: var(--good-soft); color: var(--good); }
+.feedback.bad { background: var(--retry-soft); color: var(--retry); }
+.feedback span { color: var(--ink); display: block; font-weight: 400; font-size: 17px; }
+
+/* ---------- dock ---------- */
+.dock {
+  background: var(--white); border-radius: 20px; border: 2px solid var(--line);
+  padding: 14px 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px;
+}
+.dock-label { font-size: 15px; font-weight: 700; color: var(--muted); display: block; margin-bottom: 6px; }
+.wallet { flex: 1 1 280px; min-width: 0; }
+.wallet-coins { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+.wallet-coins .coin svg { transition: transform .12s; }
+.wallet-coins .coin:hover svg { transform: translateY(-4px) rotate(-6deg); }
+.wallet-coins .coin:active svg { transform: scale(.92); }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.btn {
+  border: 0; border-radius: 16px; padding: 14px 26px; font-family: var(--f-display); font-weight: 800; font-size: 24px;
+  box-shadow: 0 4px 0 rgba(34,48,42,.35); transition: transform .08s;
+}
+.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(34,48,42,.35); }
+.btn-pay { background: var(--good); color: var(--white); }
+.btn-ghost { background: var(--paper); color: var(--ink); font-size: 18px; padding: 12px 18px; }
+.btn-yes { background: var(--good); color: var(--white); flex: 1 1 140px; font-size: 32px; padding: 18px; }
+.btn-no { background: var(--no); color: var(--white); flex: 1 1 140px; font-size: 32px; padding: 18px; }
+.btn-num { background: var(--tag); color: var(--ink); flex: 1 1 120px; font-size: 30px; padding: 16px; font-variant-numeric: tabular-nums; }
+.btn-num:disabled { opacity: .35; text-decoration: line-through; cursor: default; }
+.btn-next { background: var(--ink); color: var(--white); flex: 1 1 200px; }
+.answer-row { display: flex; flex-wrap: wrap; gap: 14px; width: 100%; }
+.help { display: flex; align-items: center; gap: 6px; font-size: 15px; color: var(--muted); }
+.help input { width: 20px; height: 20px; accent-color: var(--good); }
+
+/* ---------- level-up ---------- */
+.overlay { position: fixed; inset: 0; z-index: 20; background: rgba(34,48,42,.45); display: grid; place-items: center; padding: 16px; }
+.overlay-card {
+  background: var(--stall); border: 3px solid var(--ink); border-radius: 22px; padding: 26px 28px; max-width: 420px; text-align: center;
+  animation: pop .4s ease-out;
+}
+.overlay-card h2 { font-family: var(--f-display); font-weight: 800; font-size: 40px; margin: 0 0 6px; color: var(--awning); }
+.overlay-card p { margin: 0 0 18px; font-size: 19px; line-height: 1.4; }
+.confetti { position: fixed; top: -20px; width: 10px; height: 14px; z-index: 21; pointer-events: none; animation: fall linear forwards; }
+
+@keyframes pop { 0% { transform: scale(.6); opacity: 0 } 70% { transform: scale(1.06) } 100% { transform: scale(1); opacity: 1 } }
+.feedback { animation-name: popc; }
+@keyframes popc { 0% { transform: translateX(-50%) scale(.7); opacity: 0 } 100% { transform: translateX(-50%) scale(1); opacity: 1 } }
+@keyframes drop { 0% { transform: translateY(-60px) scale(.8); opacity: 0 } 100% { transform: none; opacity: 1 } }
+@keyframes sold { to { transform: translate(40vw, -30vh) scale(.15) rotate(30deg); opacity: 0 } }
+@keyframes shake { 20%,60% { transform: translateX(-10px) } 40%,80% { transform: translateX(10px) } }
+@keyframes swing { 0%,100% { transform: rotate(-4deg) } 50% { transform: rotate(4deg) } }
+@keyframes fall { to { transform: translateY(110vh) rotate(720deg) } }
+
+@media (max-width: 640px) {
+  .brand { font-size: 22px; }
+  .modes button { padding: 7px 10px; font-size: 15px; }
+  .topline { padding: 24px 14px 0; }
+  .showcase { flex-direction: row; }
+  .btn { font-size: 20px; padding: 12px 18px; }
+  .btn-yes, .btn-no { font-size: 26px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <radialGradient id="gSilver" cx="38%" cy="32%" r="75%">
+      <stop offset="0" stop-color="#FAFBFC"/><stop offset=".55" stop-color="#C8CDD4"/><stop offset="1" stop-color="#8E959F"/>
+    </radialGradient>
+    <radialGradient id="gGold" cx="38%" cy="32%" r="75%">
+      <stop offset="0" stop-color="#FFF0B8"/><stop offset=".55" stop-color="#E3B447"/><stop offset="1" stop-color="#A9781B"/>
+    </radialGradient>
+  </defs>
+</svg>
+
+<div class="app">
+  <header>
+    <div class="brand">Kiosken</div>
+    <nav class="modes" id="modes" aria-label="Oppgavetype">
+      <button data-mode="betal" aria-pressed="true">Betal</button>
+      <button data-mode="raad" aria-pressed="false">Har jeg råd?</button>
+      <button data-mode="tell" aria-pressed="false">Tell pengene</button>
+    </nav>
+    <div class="spacer"></div>
+    <div class="level">
+      <span class="level-label">Nivå</span>
+      <div class="level-chips" id="levels"></div>
+      <div class="dots" id="dots" aria-label="Fremgang på nivået"></div>
+    </div>
+    <div class="stars" aria-label="Stjerner">
+      <svg viewBox="0 0 24 24"><path d="M12 2l3 6.6 7.2.8-5.4 4.9 1.5 7.1L12 17.8 5.7 21.4l1.5-7.1L1.8 9.4 9 8.6z" fill="#FFC928" stroke="#B9860A" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      <span id="starCount">0</span>
+    </div>
+    <button class="icon-btn" id="soundBtn" aria-label="Lyd av eller på"></button>
+  </header>
+
+  <main class="stall" id="stall">
+    <div class="awning" aria-hidden="true"></div>
+    <div class="topline">
+      <p class="prompt" id="prompt"></p>
+      <div class="basket" aria-label="Handlekurven">
+        <svg class="basket-icon" viewBox="0 0 40 40" aria-hidden="true"><path d="M8 16 Q20 2 32 16" fill="none" stroke="#9A6232" stroke-width="3"/><path d="M4 16h32l-4 18H8z" fill="#C98B4F" stroke="#9A6232" stroke-width="2" stroke-linejoin="round"/><path d="M12 20v10M20 20v10M28 20v10" stroke="#9A6232" stroke-width="2"/></svg>
+        <div class="basket-items" id="basketItems"></div>
+        <b id="basketCount">0</b>
+      </div>
+    </div>
+    <div class="showcase">
+      <div class="item" id="item"></div>
+      <div class="tagwrap" id="tagwrap"><div class="tag" id="tag"></div></div>
+    </div>
+    <div class="counter">
+      <div class="tray" id="tray">
+        <span class="tray-label" id="trayLabel"></span>
+        <span class="tray-sum" id="traySum" hidden></span>
+        <div class="tray-coins" id="trayCoins"></div>
+      </div>
+    </div>
+    <div class="feedback" id="feedback" hidden role="status" aria-live="polite"></div>
+  </main>
+
+  <section class="dock" id="dock"></section>
+</div>
+
+<script>
+(function () {
+  /* ---------- data ---------- */
+  const LEVELS = [
+    { min: 1,  max: 5,  coins: [1, 5],     text: "Nå koster varene opp til 5 kr." },
+    { min: 3,  max: 10, coins: [1, 5, 10], text: "Nå koster varene opp til 10 kr. Du får en tikroning!" },
+    { min: 6,  max: 20, coins: [1, 5, 10], text: "Nå koster varene opp til 20 kr." },
+    { min: 11, max: 30, coins: [1, 5, 10], text: "Nå koster varene opp til 30 kr." }
+  ];
+  const GOAL = 5;
+  const COIN = { 1: { mm: 21, gold: false, hole: true }, 5: { mm: 26, gold: false, hole: true }, 10: { mm: 24, gold: true, hole: false } };
+
+  const ITEMS = [
+    { id: "eple", a: "et eple", def: "Eplet", svg: '<path d="M50 30C30 18 12 32 14 55c2 25 21 37 36 31 15 6 34-6 36-31 2-23-16-37-36-25z" fill="#E63946"/><path d="M50 30q2-12 8-18" stroke="#5B3A1E" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M54 22q14-12 24-4-12 10-24 4z" fill="#4CAF50"/><ellipse cx="31" cy="46" rx="6" ry="11" fill="#fff" opacity=".35"/>' },
+    { id: "banan", a: "en banan", def: "Bananen", svg: '<path d="M22 24q2 46 48 56 14 2 18-6-28-2-44-18-12-12-14-32z" fill="#F9D44A" stroke="#C99A1B" stroke-width="2.5" stroke-linejoin="round"/><path d="M31 30q6 28 40 44" stroke="#E0B52E" stroke-width="2.5" fill="none"/><rect x="19" y="15" width="9" height="11" rx="2" fill="#6B4E1E"/><circle cx="87" cy="74" r="2.5" fill="#4A3A1A"/>' },
+    { id: "gulrot", a: "en gulrot", def: "Gulrota", svg: '<path d="M62 28q16 6 12 22L24 88q-6 2-6-4l34-52q4-6 10-4z" fill="#F28C28"/><path d="M48 46l8 4M40 58l8 4M32 70l7 3" stroke="#C9661A" stroke-width="2.5" stroke-linecap="round"/><path d="M66 30q-2-16-10-22M68 30q6-16 16-20M70 34q16-8 22-4" stroke="#3E9B4F" stroke-width="5" fill="none" stroke-linecap="round"/>' },
+    { id: "is", a: "en is", def: "Isen", svg: '<rect x="45" y="66" width="10" height="28" rx="5" fill="#D9B27C"/><path d="M30 30q0-20 20-20t20 20v42q0 4-4 4H34q-4 0-4-4z" fill="#FF7BAC"/><path d="M30 48l40-7v11l-40 7z" fill="#FFD1E3"/><path d="M30 30q0-20 20-20t20 20v4l-40 5z" fill="#7A4A2E"/><circle cx="40" cy="22" r="1.8" fill="#FFD84D"/><circle cx="52" cy="18" r="1.8" fill="#7FD3F7"/><circle cx="60" cy="26" r="1.8" fill="#FFF"/>' },
+    { id: "bolle", a: "en skolebolle", def: "Skolebollen", svg: '<ellipse cx="50" cy="62" rx="40" ry="24" fill="#C9852F"/><ellipse cx="50" cy="55" rx="36" ry="20" fill="#F6F1E8"/><ellipse cx="50" cy="53" rx="14" ry="8.5" fill="#F7C531"/><g fill="#E2D8C6"><circle cx="24" cy="54" r="1.6"/><circle cx="32" cy="64" r="1.6"/><circle cx="72" cy="47" r="1.6"/><circle cx="78" cy="58" r="1.6"/><circle cx="64" cy="66" r="1.6"/><circle cx="34" cy="44" r="1.6"/></g>' },
+    { id: "melk", a: "en melk", def: "Melka", svg: '<rect x="44" y="10" width="12" height="9" fill="#E3EAF3"/><path d="M30 34l20-16 20 16z" fill="#E3EAF3" stroke="#9DB3CF" stroke-width="2" stroke-linejoin="round"/><rect x="30" y="34" width="40" height="56" fill="#fff" stroke="#9DB3CF" stroke-width="2"/><rect x="30" y="50" width="40" height="24" fill="#3B82C4"/><text x="50" y="67" text-anchor="middle" font-family="Andika, Verdana, sans-serif" font-weight="700" font-size="12" fill="#fff">MELK</text><path d="M38 84q6-6 12 0t12 0" stroke="#9DB3CF" stroke-width="2" fill="none"/>' },
+    { id: "blyant", a: "en blyant", def: "Blyanten", svg: '<g transform="rotate(-35 50 50)"><rect x="16" y="42" width="54" height="16" fill="#F5C518"/><rect x="16" y="42" width="54" height="5" fill="#FFDD55"/><rect x="9" y="42" width="8" height="16" fill="#B8BCC4"/><rect x="1" y="42" width="10" height="16" rx="3" fill="#F28FA6"/><path d="M70 42l18 8-18 8z" fill="#F0D2A8"/><path d="M82 47.3l6 2.7-6 2.7z" fill="#333"/></g>' },
+    { id: "viskelaer", a: "et viskelær", def: "Viskelæret", svg: '<g transform="rotate(-12 50 50)"><rect x="16" y="38" width="68" height="30" rx="6" fill="#FFFFFF" stroke="#C3CAD4" stroke-width="2"/><rect x="40" y="36" width="44" height="34" rx="3" fill="#3E7BD6"/><rect x="40" y="36" width="44" height="8" fill="#5A93E6"/><text x="62" y="60" text-anchor="middle" font-family="Andika, Verdana, sans-serif" font-weight="700" font-size="9" fill="#fff">VISK</text></g>' },
+    { id: "ball", a: "en ball", def: "Ballen", svg: '<circle cx="50" cy="52" r="38" fill="#fff"/><path d="M50 52L50 14A38 38 0 0 1 82.9 33z" fill="#E63946"/><path d="M50 52L82.9 71A38 38 0 0 1 50 90z" fill="#2E86DE"/><path d="M50 52L17.1 71A38 38 0 0 1 17.1 33z" fill="#F9C80E"/><circle cx="50" cy="52" r="38" fill="none" stroke="#22302A" stroke-width="2.5"/><circle cx="50" cy="52" r="5" fill="#fff" stroke="#22302A" stroke-width="2"/><ellipse cx="36" cy="32" rx="8" ry="5" fill="#fff" opacity=".5" transform="rotate(-30 36 32)"/>' },
+    { id: "bil", a: "en lekebil", def: "Lekebilen", svg: '<path d="M10 64V52q0-6 6-6h12l10-15q2-3 6-3h22q4 0 6 4l8 14h6q6 0 6 6v12q0 4-4 4H14q-4 0-4-4z" fill="#2E86DE"/><path d="M42 46l6-12h10v12zM62 46V34h6l7 12z" fill="#CFE8FF"/><rect x="82" y="52" width="6" height="5" rx="1" fill="#FFD84D"/><circle cx="30" cy="68" r="10" fill="#2B2B2B"/><circle cx="30" cy="68" r="4" fill="#C9CED6"/><circle cx="72" cy="68" r="10" fill="#2B2B2B"/><circle cx="72" cy="68" r="4" fill="#C9CED6"/>' }
+  ];
+  const PIG = '<ellipse cx="50" cy="56" rx="36" ry="27" fill="#F7A8C0"/><circle cx="80" cy="52" r="11" fill="#F48CAE"/><ellipse cx="80" cy="52" rx="2" ry="3" fill="#B84D72"/><ellipse cx="86" cy="52" rx="2" ry="3" fill="#B84D72"/><path d="M62 32l6-12 6 14z" fill="#F48CAE"/><circle cx="66" cy="45" r="3" fill="#22302A"/><rect x="40" y="29" width="18" height="4" rx="2" fill="#B84D72"/><rect x="26" y="76" width="9" height="12" rx="3" fill="#F48CAE"/><rect x="58" y="76" width="9" height="12" rx="3" fill="#F48CAE"/><path d="M14 52q-8-2-6 6" stroke="#F48CAE" stroke-width="3" fill="none" stroke-linecap="round"/>';
+  const itemSVG = (svg) => '<svg viewBox="0 0 100 100" aria-hidden="true">' + svg + '</svg>';
+
+  /* ---------- state ---------- */
+  const S = { mode: "betal", level: 0, progress: 0, stars: 0, basket: [], sound: true, showSum: false, round: null, tray: [], locked: false, lastItem: null };
+  try {
+    const saved = JSON.parse(localStorage.getItem("kiosken-v1") || "null");
+    if (saved) Object.assign(S, { level: saved.level || 0, progress: saved.progress || 0, stars: saved.stars || 0, basket: saved.basket || [], sound: saved.sound !== false, showSum: !!saved.showSum });
+  } catch (e) {}
+  function save() {
+    try { localStorage.setItem("kiosken-v1", JSON.stringify({ level: S.level, progress: S.progress, stars: S.stars, basket: S.basket.slice(-40), sound: S.sound, showSum: S.showSum })); } catch (e) {}
+  }
+
+  /* ---------- helpers ---------- */
+  const $ = (id) => document.getElementById(id);
+  const rand = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+  const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+  const shuffle = (arr) => { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; };
+  const sum = (arr) => arr.reduce((s, v) => s + v, 0);
+
+  function coinSVG(v, unit) {
+    const c = COIN[v], px = Math.round(c.mm * unit);
+    const fill = c.gold ? "url(#gGold)" : "url(#gSilver)";
+    const edge = c.gold ? "#8A6214" : "#6F7782";
+    const txt = c.gold ? "#6E4D0E" : "#4B525C";
+    const body = c.hole ? "M50 2a48 48 0 1 0 .01 0zM50 41a9 9 0 1 0 .01 0z" : "M50 2a48 48 0 1 0 .01 0z";
+    let s = '<svg viewBox="0 0 100 100" width="' + px + '" height="' + px + '" aria-hidden="true">' +
+      '<path fill-rule="evenodd" d="' + body + '" fill="' + fill + '" stroke="' + edge + '" stroke-width="2.5"/>' +
+      '<circle cx="50" cy="50" r="41" fill="none" stroke="' + edge + '" stroke-width="1.5" opacity=".45"/>';
+    if (c.hole) {
+      s += '<circle cx="50" cy="50" r="12" fill="none" stroke="' + edge + '" stroke-width="1.5" opacity=".5"/>' +
+        '<text x="50" y="35" text-anchor="middle" font-family="Grandstander, Verdana, sans-serif" font-weight="800" font-size="25" fill="' + txt + '">' + v + '</text>' +
+        '<text x="50" y="80" text-anchor="middle" font-family="Andika, Verdana, sans-serif" font-weight="700" font-size="14" fill="' + txt + '">KR</text>';
+    } else {
+      s += '<text x="50" y="60" text-anchor="middle" font-family="Grandstander, Verdana, sans-serif" font-weight="800" font-size="36" fill="' + txt + '">' + v + '</text>' +
+        '<text x="50" y="81" text-anchor="middle" font-family="Andika, Verdana, sans-serif" font-weight="700" font-size="13" fill="' + txt + '">KR</text>';
+    }
+    return s + "</svg>";
+  }
+  const coinName = (v) => v === 1 ? "1 krone" : v + " kroner";
+
+  function decompose(t, coins) {
+    let best = null;
+    for (let k = 0; k < 40; k++) {
+      let r = t; const out = [];
+      while (r > 0) {
+        const ok = coins.filter((c) => c <= r);
+        const c = Math.random() < 0.6 ? ok[ok.length - 1] : pick(ok);
+        out.push(c); r -= c;
+      }
+      if (out.length <= 9 && out.length >= Math.min(2, t)) { best = out; break; }
+      if (!best || out.length < best.length) best = out;
+    }
+    return S.level < 2 ? best.sort((a, b) => b - a) : shuffle(best);
+  }
+  function fewestCoins(p, coins) {
+    let n = 0, r = p;
+    for (const c of [...coins].sort((a, b) => b - a)) { n += Math.floor(r / c); r %= c; }
+    return n;
+  }
+
+  /* ---------- sound ---------- */
+  let actx = null;
+  function tone(freq, dur, type, vol, delay) {
+    if (!S.sound) return;
+    try {
+      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+      const t = actx.currentTime + (delay || 0);
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type = type || "sine"; o.frequency.value = freq;
+      g.gain.setValueAtTime(vol || 0.12, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t + dur + 0.02);
+    } catch (e) {}
+  }
+  const sClink = () => { tone(1900, 0.07, "triangle", 0.07); tone(2700, 0.12, "triangle", 0.04, 0.04); };
+  const sGood = () => { tone(660, 0.14, "sine", 0.14); tone(880, 0.16, "sine", 0.14, 0.11); tone(1320, 0.32, "sine", 0.12, 0.22); };
+  const sBad = () => { tone(260, 0.18, "sine", 0.12); tone(200, 0.28, "sine", 0.1, 0.14); };
+
+  /* ---------- rendering ---------- */
+  function renderHeader() {
+    document.querySelectorAll("#modes button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === S.mode)));
+    $("levels").innerHTML = LEVELS.map((L, i) =>
+      '<button data-level="' + i + '" aria-pressed="' + (i === S.level) + '" title="Opp til ' + L.max + ' kr">' + (i + 1) + "</button>").join("");
+    $("dots").innerHTML = Array.from({ length: GOAL }, (_, i) => '<i class="' + (i < S.progress ? "on" : "") + '"></i>').join("");
+    $("starCount").textContent = S.stars;
+    $("soundBtn").innerHTML = S.sound
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="#22302A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#22302A"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="#22302A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#22302A"/><path d="M17 9l5 6M22 9l-5 6"/></svg>';
+    $("soundBtn").setAttribute("aria-pressed", String(S.sound));
+  }
+
+  function renderBasket(popLast) {
+    const last = S.basket.slice(-8);
+    $("basketItems").innerHTML = last.map((id, i) => {
+      const it = ITEMS.find((x) => x.id === id);
+      return it ? '<span class="' + (popLast && i === last.length - 1 ? "pop" : "") + '">' + itemSVG(it.svg) + "</span>" : "";
+    }).join("");
+    $("basketCount").textContent = S.basket.length;
+  }
+
+  function renderTray() {
+    const R = S.round;
+    const wrap = $("trayCoins");
+    if (S.mode === "betal") {
+      $("trayLabel").textContent = "Brettet – trykk på en mynt for å ta den tilbake";
+      $("tray").classList.remove("solid");
+      wrap.innerHTML = S.tray.length
+        ? S.tray.map((v, i) => '<button class="coin" data-idx="' + i + '" aria-label="Ta tilbake ' + coinName(v) + '">' + coinSVG(v, 2.3) + "</button>").join("")
+        : '<span class="empty">Legg myntene her.</span>';
+      const sh = S.showSum && S.tray.length > 0;
+      $("traySum").hidden = !sh;
+      if (sh) $("traySum").textContent = "Sum: " + sum(S.tray) + " kr";
+    } else {
+      $("trayLabel").textContent = "Pengene dine";
+      $("tray").classList.add("solid");
+      $("traySum").hidden = true;
+      wrap.innerHTML = R.purse.map((v) => '<span class="coin" role="img" aria-label="' + coinName(v) + '">' + coinSVG(v, 2.6) + "</span>").join("");
+    }
+  }
+
+  function renderDock() {
+    const R = S.round, d = $("dock");
+    if (R.done) {
+      d.innerHTML = '<div class="answer-row"><button class="btn btn-next" id="nextBtn">Neste</button></div>';
+      return;
+    }
+    if (S.mode === "betal") {
+      const coins = LEVELS[S.level].coins;
+      d.innerHTML =
+        '<div class="wallet"><span class="dock-label">Lommeboka – trykk på en mynt</span><div class="wallet-coins">' +
+        coins.map((v) => '<button class="coin" data-add="' + v + '" aria-label="Legg på ' + coinName(v) + '">' + coinSVG(v, 3.3) + "</button>").join("") +
+        '</div></div><div class="actions">' +
+        '<label class="help"><input type="checkbox" id="sumToggle"' + (S.showSum ? " checked" : "") + "> Vis sum</label>" +
+        '<button class="btn btn-ghost" id="clearBtn">Tøm brettet</button>' +
+        '<button class="btn btn-pay" id="payBtn">Betal</button></div>';
+    } else if (S.mode === "raad") {
+      d.innerHTML = '<div class="answer-row"><button class="btn btn-yes" data-answer="ja">Ja</button><button class="btn btn-no" data-answer="nei">Nei</button></div>';
+    } else {
+      d.innerHTML = '<div class="answer-row">' + R.choices.map((c) =>
+        '<button class="btn btn-num" data-num="' + c + '"' + (R.wrong.includes(c) ? " disabled" : "") + ">" + c + " kr</button>").join("") + "</div>";
+    }
+  }
+
+  function renderRound(enter) {
+    const R = S.round;
+    const itemEl = $("item");
+    itemEl.className = "item";
+    if (S.mode === "tell") {
+      itemEl.innerHTML = itemSVG(PIG);
+      $("tagwrap").hidden = true;
+      $("prompt").textContent = "Hvor mange kroner har du til sparegrisen? Tell myntene.";
+    } else {
+      itemEl.innerHTML = itemSVG(R.item.svg);
+      $("tagwrap").hidden = false;
+      $("tag").innerHTML = R.price + "<small>kr</small>";
+      $("prompt").textContent = S.mode === "betal"
+        ? "Kjøp " + R.item.a + "! Legg riktig antall kroner på brettet og trykk Betal."
+        : "Har du råd til " + R.item.a + "?";
+    }
+    if (enter) { void itemEl.offsetWidth; itemEl.classList.add("enter"); }
+    renderTray();
+    renderDock();
+  }
+
+  let fbTimer = null;
+  function feedback(kind, title, detail) {
+    const f = $("feedback");
+    f.className = "feedback " + kind;
+    f.innerHTML = title + (detail ? "<span>" + detail + "</span>" : "");
+    f.hidden = false;
+    clearTimeout(fbTimer);
+    if (kind === "good") fbTimer = setTimeout(() => { f.hidden = true; }, 1500);
+  }
+  const hideFeedback = () => { clearTimeout(fbTimer); $("feedback").hidden = true; };
+
+  /* ---------- rounds ---------- */
+  function newRound() {
+    hideFeedback();
+    const L = LEVELS[S.level];
+    let item;
+    do { item = pick(ITEMS); } while (item.id === S.lastItem);
+    S.lastItem = item.id;
+    const price = rand(L.min, L.max);
+    const R = { item, price, done: false, wrong: [], firstTry: true };
+    if (S.mode === "raad") {
+      let total;
+      const yes = Math.random() < 0.5;
+      if (yes) total = price + (Math.random() < 0.3 ? 0 : rand(1, 3));
+      else total = price - rand(1, Math.min(3, price - 1 || 1));
+      if (total < 1) total = price + rand(0, 2);
+      R.total = total;
+      R.purse = decompose(total, L.coins);
+    } else if (S.mode === "tell") {
+      const total = rand(Math.max(2, L.min), L.max);
+      R.total = total;
+      R.purse = decompose(total, L.coins);
+      const cands = shuffle([total - 1, total + 1, total - 2, total + 2, total + 5, total - 5]).filter((n) => n > 0);
+      const choices = [total];
+      for (const c of cands) { if (choices.length < 3 && !choices.includes(c)) choices.push(c); }
+      R.choices = shuffle(choices);
+    }
+    S.round = R;
+    S.tray = [];
+    S.locked = false;
+    renderRound(true);
+  }
+
+  function win(extra) {
+    S.locked = true;
+    S.stars += 1 + (extra ? 1 : 0);
+    S.progress += 1;
+    sGood();
+    if (S.mode !== "tell") {
+      S.basket.push(S.round.item.id);
+      $("item").classList.add("sold");
+      setTimeout(() => renderBasket(true), 450);
+    }
+    renderHeader();
+    save();
+    setTimeout(() => {
+      if (S.progress >= GOAL) levelUp(); else newRound();
+    }, 1500);
+  }
+
+  function levelUp() {
+    S.progress = 0;
+    const last = S.level === LEVELS.length - 1;
+    if (!last) S.level += 1;
+    save();
+    renderHeader();
+    confetti();
+    const ov = document.createElement("div");
+    ov.className = "overlay";
+    ov.innerHTML = '<div class="overlay-card" role="dialog" aria-modal="true"><h2>' + (last ? "Kjempebra!" : "Nivå " + (S.level + 1) + "!") + "</h2><p>" +
+      (last ? "Du har klart alle nivåene. Fortsett å handle på nivå 4, eller velg et annet nivå." : LEVELS[S.level].text) +
+      '</p><button class="btn btn-pay" id="goOn">Fortsett</button></div>';
+    document.body.appendChild(ov);
+    const btn = ov.querySelector("#goOn");
+    btn.focus();
+    btn.addEventListener("click", () => { ov.remove(); newRound(); });
+  }
+
+  function confetti() {
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const cols = ["#D7432F", "#FFD84D", "#2C9A57", "#2E86DE", "#F7A8C0"];
+    for (let i = 0; i < 46; i++) {
+      const c = document.createElement("i");
+      c.className = "confetti";
+      c.style.left = Math.random() * 100 + "vw";
+      c.style.background = pick(cols);
+      c.style.animationDuration = 1.6 + Math.random() * 1.4 + "s";
+      c.style.animationDelay = Math.random() * 0.4 + "s";
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 3600);
+    }
+  }
+
+  function shakeItem() {
+    const el = $("item");
+    el.classList.remove("shake", "enter"); void el.offsetWidth; el.classList.add("shake");
+  }
+
+  /* ---------- actions ---------- */
+  function pay() {
+    if (S.locked) return;
+    const R = S.round, paid = sum(S.tray);
+    if (!S.tray.length) { feedback("bad", "Brettet er tomt.", "Trykk på myntene i lommeboka for å legge dem på brettet."); return; }
+    if (paid === R.price) {
+      const best = fewestCoins(R.price, LEVELS[S.level].coins);
+      const bonus = S.tray.length === best && best > 1;
+      feedback("good", "Riktig! Du betalte " + R.price + " kr.", bonus ? "Ekstra stjerne: du brukte færrest mulig mynter!" : "");
+      win(bonus);
+    } else {
+      sBad(); shakeItem();
+      feedback("bad", paid < R.price ? "Det er for lite." : "Det er for mye.",
+        "Du la på " + paid + " kr. " + R.item.def + " koster " + R.price + " kr. Prøv igjen!");
+    }
+  }
+
+  function answerRaad(ans) {
+    if (S.locked) return;
+    const R = S.round, canBuy = R.total >= R.price, right = (ans === "ja") === canBuy;
+    const why = canBuy
+      ? (R.total === R.price ? "Du har " + R.total + " kr. Det er akkurat nok." : "Du har " + R.total + " kr. Det holder til " + R.price + " kr.")
+      : "Du har " + R.total + " kr. Det mangler " + (R.price - R.total) + " kr.";
+    if (right) { feedback("good", "Riktig!", why); win(false); }
+    else {
+      sBad(); S.locked = true; R.done = true;
+      feedback("bad", canBuy ? "Du har faktisk råd." : "Du har ikke råd.", why);
+      renderDock();
+    }
+  }
+
+  function answerTell(n) {
+    if (S.locked) return;
+    const R = S.round;
+    if (n === R.total) {
+      feedback("good", "Riktig! Du har " + R.total + " kr.", R.firstTry ? "" : "Neste gang klarer du det på første forsøk.");
+      if (R.firstTry) win(false);
+      else { sGood(); S.locked = true; setTimeout(newRound, 1500); }
+    } else {
+      sBad(); R.firstTry = false; R.wrong.push(n);
+      feedback("bad", "Ikke helt.", "Tell en gang til. Start med de største myntene.");
+      renderDock();
+    }
+  }
+
+  /* ---------- events ---------- */
+  $("modes").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-mode]"); if (!b || b.dataset.mode === S.mode) return;
+    S.mode = b.dataset.mode; renderHeader(); newRound();
+  });
+  $("levels").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-level]"); if (!b) return;
+    S.level = +b.dataset.level; S.progress = 0; save(); renderHeader(); newRound();
+  });
+  $("soundBtn").addEventListener("click", () => { S.sound = !S.sound; save(); renderHeader(); if (S.sound) sClink(); });
+
+  $("trayCoins").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-idx]"); if (!b || S.locked) return;
+    S.tray.splice(+b.dataset.idx, 1); sClink(); hideFeedback(); renderTray();
+  });
+
+  $("dock").addEventListener("click", (e) => {
+    const add = e.target.closest("[data-add]");
+    if (add && !S.locked) {
+      if (S.tray.length >= 15) { feedback("bad", "Brettet er fullt.", "Ta bort noen mynter først."); return; }
+      S.tray.push(+add.dataset.add); sClink(); hideFeedback(); renderTray(); return;
+    }
+    if (e.target.closest("#payBtn")) return pay();
+    if (e.target.closest("#clearBtn")) { if (S.locked) return; S.tray = []; hideFeedback(); renderTray(); return; }
+    if (e.target.closest("#nextBtn")) return newRound();
+    const a = e.target.closest("[data-answer]"); if (a) return answerRaad(a.dataset.answer);
+    const n = e.target.closest("[data-num]"); if (n && !n.disabled) return answerTell(+n.dataset.num);
+  });
+  $("dock").addEventListener("change", (e) => {
+    if (e.target.id === "sumToggle") { S.showSum = e.target.checked; save(); renderTray(); }
+  });
+
+  renderHeader();
+  renderBasket(false);
+  newRound();
+})();
+</script>
+
+</body></html>
