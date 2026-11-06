@@ -1465,7 +1465,7 @@ function renderCard(){
     ?`<div class="mixbar"><span style="--c:var(--N);width:100%"></span></div>`
     :`<div class="mixbar">${m.map(x=>`<span style="--c:var(--${x.k});width:${(x.w*100).toFixed(1)}%"></span>`).join("")}</div>`;
   c.innerHTML=`
-    <button class="x" data-vc="x" aria-label="Lukk og fjern valget">×</button>
+    <button class="x" data-vc="x" aria-label="Lukk">×</button>
     <div class="eyebrow">${esc(lvl)} · ${typ}</div>
     <h2>${n.sym?`<span class="sym">${esc(n.sym)}</span>`:""}${esc(n.n)}</h2>
     ${n.vurd?`<div class="badge">Til vurdering · utenfor læreplanen</div>`:""}
@@ -1477,7 +1477,7 @@ function renderCard(){
 }
 $("#vcard").addEventListener("click",e=>{
   const b=e.target.closest("[data-vc]"); if(!b) return;
-  if(b.getAttribute("data-vc")==="sti") openSti(); else clearSel();
+  if(b.getAttribute("data-vc")==="sti") openSti(); else { $("#vcard").hidden=true; $("#vulkanFull").classList.remove("has-card"); }
 });
 function select(id){
   if(!byId.has(id)) return;
